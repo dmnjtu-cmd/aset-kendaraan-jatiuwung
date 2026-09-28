@@ -1,6 +1,6 @@
 // ISI HANYA Publishable Key. JANGAN masukkan Secret Key.
-const SUPABASE_URL="https://ISI-PROJECT.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="ISI-PUBLISHABLE-KEY";
+const SUPABASE_URL="https://https://uwlvuvoqkgvwyxvkfdsd.supabase.co/rest/v1/";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_2SehD19CRmHFNHNEVakfMQ_Q58rNdi1";
 const sb=(SUPABASE_URL.includes("ISI-PROJECT"))?null:window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 let data=[];
 const $=x=>document.getElementById(x);
