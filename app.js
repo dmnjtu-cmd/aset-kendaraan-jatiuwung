@@ -40,6 +40,7 @@ async function loginUser(email, password){
         });
 
     if(result.error){
+
         $("msg").textContent =
             result.error.message;
 
@@ -69,7 +70,6 @@ function showLogin(){
 
     $("login").style.display = "flex";
     $("app").style.display = "none";
-
 }
 
 
@@ -80,7 +80,6 @@ function showApp(){
 
     $("login").style.display = "none";
     $("app").style.display = "block";
-
 }
 
 
@@ -95,6 +94,7 @@ function openPage(page){
         .forEach(el => {
             el.classList.remove("active");
         });
+
 
     const target =
         $("page-" + page);
@@ -139,32 +139,53 @@ function openPage(page){
     };
 
 
-    $("topTitle").textContent =
-        titles[page] || "Dashboard";
+    if($("topTitle")){
+
+        $("topTitle").textContent =
+            titles[page] || "Dashboard";
+
+    }
 
 
-    // Tutup sidebar di HP
-    $("sidebar").classList.remove("open");
+    if($("sidebar")){
+
+        $("sidebar").classList.remove("open");
+
+    }
 
 
     if(page === "dashboard"){
+
         renderDashboard();
+
     }
+
 
     if(page === "kendaraan"){
+
         renderVehicles();
+
     }
+
 
     if(page === "dokumen"){
+
         renderDocuments();
+
     }
+
 
     if(page === "pemeliharaan"){
+
         renderMaintenance();
+
     }
 
+
     if(page === "jatuh-tempo"){
+
         renderDueDates();
+
     }
 
 }
@@ -192,19 +213,27 @@ async function loadVehicles(){
 
         console.error(result.error);
 
-        $("databaseStatus").textContent =
-            "Gagal membaca database";
+        if($("databaseStatus")){
 
-        return;
+            $("databaseStatus").textContent =
+                "Gagal membaca database";
 
+        }
+
+        return false;
     }
 
 
-    data = result.data || [];
+    data =
+        result.data || [];
 
 
-    $("databaseStatus").textContent =
-        "Terhubung";
+    if($("databaseStatus")){
+
+        $("databaseStatus").textContent =
+            "Terhubung";
+
+    }
 
 
     renderDashboard();
@@ -212,6 +241,7 @@ async function loadVehicles(){
     renderDocuments();
     renderDueDates();
 
+    return true;
 }
 
 
@@ -226,10 +256,12 @@ function renderDashboard(){
             x => x.jenis_kendaraan === "Mobil"
         ).length;
 
+
     const motor =
         data.filter(
             x => x.jenis_kendaraan === "Motor"
         ).length;
+
 
     const bentor =
         data.filter(
@@ -237,14 +269,25 @@ function renderDashboard(){
         ).length;
 
 
-    $("mobil").textContent = mobil;
-    $("motor").textContent = motor;
-    $("bentor").textContent = bentor;
-    $("total").textContent = data.length;
+    if($("mobil"))
+        $("mobil").textContent = mobil;
+
+    if($("motor"))
+        $("motor").textContent = motor;
+
+    if($("bentor"))
+        $("bentor").textContent = bentor;
+
+    if($("total"))
+        $("total").textContent = data.length;
 
 
     const recent =
         data.slice(0,5);
+
+
+    if(!$("recentVehicles"))
+        return;
 
 
     if(!recent.length){
@@ -255,7 +298,6 @@ function renderDashboard(){
              </div>`;
 
         return;
-
     }
 
 
@@ -265,13 +307,30 @@ function renderDashboard(){
             <div class="info-box">
 
                 <strong>
-                    ${escapeHtml(v.nomor_polisi || "-")}
+                    ${escapeHtml(
+                        v.nomor_polisi || "-"
+                    )}
                 </strong>
 
                 <span>
-                    ${escapeHtml(v.merk_tipe || "-")}
+
+                    ${escapeHtml(
+                        v.merk_tipe || "-"
+                    )}
+
                     ·
-                    ${escapeHtml(v.jenis_kendaraan || "-")}
+
+                    ${escapeHtml(
+                        v.jenis_kendaraan || "-"
+                    )}
+
+                    <br>
+
+                    Pemegang:
+                    ${escapeHtml(
+                        v.nama_pemegang || "-"
+                    )}
+
                 </span>
 
             </div>
@@ -286,6 +345,10 @@ function renderDashboard(){
 // =====================================================
 
 function renderVehicles(){
+
+    if(!$("vehicleTable"))
+        return;
+
 
     const search =
         ($("search")?.value || "")
@@ -304,6 +367,9 @@ function renderVehicles(){
 
                 v.nomor_polisi,
                 v.nama_pemegang,
+                v.nip_pegawai,
+                v.jabatan_pegawai,
+                v.unit_kerja,
                 v.merk_tipe,
                 v.nomor_rangka,
                 v.nomor_mesin
@@ -347,11 +413,11 @@ function renderVehicles(){
         `;
 
         return;
-
     }
 
 
     $("vehicleTable").innerHTML =
+
         rows.map((v,index) => `
 
             <tr>
@@ -360,62 +426,90 @@ function renderVehicles(){
                     ${index + 1}
                 </td>
 
+
                 <td>
+
                     <strong>
                         ${escapeHtml(
                             v.nomor_polisi || "-"
                         )}
                     </strong>
+
                 </td>
 
+
                 <td>
+
                     <span class="badge ${
                         v.jenis_kendaraan === "Mobil"
+
                         ? "badge-blue"
+
                         : v.jenis_kendaraan === "Motor"
+
                         ? "badge-green"
+
                         : "badge-orange"
                     }">
+
                         ${escapeHtml(
                             v.jenis_kendaraan || "-"
                         )}
+
                     </span>
+
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         v.merk_tipe || "-"
                     )}
+
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         v.nama_pemegang || "-"
                     )}
+
                 </td>
 
+
                 <td>
+
                     ${v.tahun_pengadaan || "-"}
+
                 </td>
 
+
                 <td>
+
                     ${formatDate(
                         v.tanggal_perpanjangan
                     )}
+
                 </td>
+
 
                 <td>
 
                     <div class="actions">
 
                         <button
+                            type="button"
                             class="btn btn-secondary"
                             onclick="editVehicle('${v.id}')"
                         >
                             Edit
                         </button>
 
+
                         <button
+                            type="button"
                             class="btn btn-danger"
                             onclick="deleteVehicle('${v.id}')"
                         >
@@ -434,19 +528,26 @@ function renderVehicles(){
 
 
 // =====================================================
-// TAMBAH KENDARAAN
+// BUKA FORM TAMBAH
 // =====================================================
 
 function openAddVehicle(){
+
+    if(!$("vehicleForm"))
+        return;
+
 
     $("vehicleForm").reset();
 
     $("id").value = "";
 
+
     $("dlgTitle").textContent =
         "Tambah Kendaraan";
 
+
     $("formMsg").textContent = "";
+
 
     $("dlg").showModal();
 
@@ -460,10 +561,17 @@ function openAddVehicle(){
 window.editVehicle = function(id){
 
     const v =
-        data.find(x => x.id === id);
+        data.find(
+            x => x.id === id
+        );
 
 
     if(!v){
+
+        alert(
+            "Data kendaraan tidak ditemukan."
+        );
+
         return;
     }
 
@@ -471,29 +579,57 @@ window.editVehicle = function(id){
     $("id").value =
         v.id || "";
 
+
     $("jenis").value =
         v.jenis_kendaraan || "";
+
 
     $("plat").value =
         v.nomor_polisi || "";
 
+
     $("nama").value =
         v.nama_pemegang || "";
+
 
     $("merk").value =
         v.merk_tipe || "";
 
+
     $("tahun").value =
         v.tahun_pengadaan || "";
+
 
     $("rangka").value =
         v.nomor_rangka || "";
 
+
     $("mesin").value =
         v.nomor_mesin || "";
 
+
+    // DATA PEMEGANG / PEGAWAI
+
+    if($("nip"))
+        $("nip").value =
+            v.nip_pegawai || "";
+
+
+    if($("jabatan"))
+        $("jabatan").value =
+            v.jabatan_pegawai || "";
+
+
+    if($("unit"))
+        $("unit").value =
+            v.unit_kerja || "";
+
+
+    // DATA PERPANJANGAN
+
     $("tempo").value =
         v.tanggal_perpanjangan || "";
+
 
     $("kaleng").value =
         v.tanggal_ganti_kaleng || "";
@@ -502,7 +638,9 @@ window.editVehicle = function(id){
     $("dlgTitle").textContent =
         "Edit Kendaraan";
 
+
     $("formMsg").textContent = "";
+
 
     $("dlg").showModal();
 
@@ -513,84 +651,273 @@ window.editVehicle = function(id){
 // SIMPAN KENDARAAN
 // =====================================================
 
-$("vehicleForm").onsubmit =
-async function(e){
+if($("vehicleForm")){
 
-    e.preventDefault();
+    $("vehicleForm").onsubmit =
+    async function(e){
+
+        e.preventDefault();
 
 
-    const payload = {
+        $("formMsg").textContent =
+            "Menyimpan data...";
 
-        jenis_kendaraan:
-            $("jenis").value,
 
-        nomor_polisi:
-            $("plat").value
-                .trim()
-                .toUpperCase(),
+        // =================================================
+        // AMBIL DATA FORM
+        // =================================================
 
-        nama_pemegang:
-            $("nama").value.trim(),
+        const payload = {
 
-        merk_tipe:
-            $("merk").value.trim(),
+            // DATA KENDARAAN
 
-        tahun_pengadaan:
-            $("tahun").value
-            ? Number($("tahun").value)
-            : null,
+            jenis_kendaraan:
+                $("jenis").value,
 
-        nomor_rangka:
-            $("rangka").value.trim(),
+            nomor_polisi:
+                $("plat").value
+                    .trim()
+                    .toUpperCase(),
 
-        nomor_mesin:
-            $("mesin").value.trim(),
+            nama_pemegang:
+                $("nama").value.trim(),
 
-        tanggal_perpanjangan:
-            $("tempo").value || null,
+            merk_tipe:
+                $("merk").value.trim(),
 
-        tanggal_ganti_kaleng:
-            $("kaleng").value || null
+            tahun_pengadaan:
+                $("tahun").value
+                ? Number(
+                    $("tahun").value
+                )
+                : null,
+
+            nomor_rangka:
+                $("rangka").value.trim(),
+
+            nomor_mesin:
+                $("mesin").value.trim(),
+
+
+            // DATA PEMEGANG / PEGAWAI
+
+            nip_pegawai:
+                $("nip")
+                ? $("nip").value.trim()
+                : "",
+
+            jabatan_pegawai:
+                $("jabatan")
+                ? $("jabatan").value.trim()
+                : "",
+
+            unit_kerja:
+                $("unit")
+                ? $("unit").value.trim()
+                : "",
+
+
+            // DATA PERPANJANGAN
+
+            tanggal_perpanjangan:
+                $("tempo").value || null,
+
+            tanggal_ganti_kaleng:
+                $("kaleng").value || null
+
+        };
+
+
+        // =================================================
+        // VALIDASI
+        // =================================================
+
+        if(!payload.jenis_kendaraan){
+
+            $("formMsg").textContent =
+                "Jenis kendaraan wajib dipilih.";
+
+            return;
+        }
+
+
+        if(!payload.nomor_polisi){
+
+            $("formMsg").textContent =
+                "Nomor polisi wajib diisi.";
+
+            return;
+        }
+
+
+        if(!payload.nama_pemegang){
+
+            $("formMsg").textContent =
+                "Nama pemegang kendaraan wajib diisi.";
+
+            return;
+        }
+
+
+        // =================================================
+        // SIMPAN / UPDATE
+        // =================================================
+
+        let result;
+
+
+        try{
+
+            if($("id").value){
+
+                // UPDATE
+
+                result =
+                    await sb
+                        .from("kendaraan")
+                        .update(payload)
+                        .eq(
+                            "id",
+                            $("id").value
+                        );
+
+            }else{
+
+                // INSERT
+
+                result =
+                    await sb
+                        .from("kendaraan")
+                        .insert(payload);
+
+            }
+
+        }catch(error){
+
+            console.error(error);
+
+            $("formMsg").textContent =
+                "Terjadi kesalahan saat menyimpan.";
+
+            return;
+        }
+
+
+        // =================================================
+        // ERROR DATABASE
+        // =================================================
+
+        if(result.error){
+
+            console.error(
+                "Supabase error:",
+                result.error
+            );
+
+
+            $("formMsg").textContent =
+                "Gagal menyimpan: " +
+                result.error.message;
+
+
+            return;
+        }
+
+
+        // =================================================
+        // BERHASIL
+        // =================================================
+
+        $("formMsg").textContent =
+            "Data berhasil disimpan.";
+
+
+        await loadVehicles();
+
+
+        setTimeout(
+            function(){
+
+                if($("dlg").open){
+
+                    $("dlg").close();
+
+                }
+
+
+                $("vehicleForm").reset();
+
+                $("id").value = "";
+
+                $("formMsg").textContent = "";
+
+            },
+            400
+        );
 
     };
 
-
-    let result;
-
-
-    if($("id").value){
-
-        result =
-            await sb
-                .from("kendaraan")
-                .update(payload)
-                .eq("id",$("id").value);
-
-    }else{
-
-        result =
-            await sb
-                .from("kendaraan")
-                .insert(payload);
-
-    }
+}
 
 
-    if(result.error){
+// =====================================================
+// TOMBOL BATAL
+// =====================================================
 
-        $("formMsg").textContent =
-            result.error.message;
+if($("batal")){
 
-        return;
+    $("batal").onclick =
+    function(e){
 
-    }
+        e.preventDefault();
 
 
-    $("dlg").close();
+        $("vehicleForm").reset();
 
-    await loadVehicles();
+        $("id").value = "";
 
-};
+        $("formMsg").textContent = "";
+
+
+        if($("dlg").open){
+
+            $("dlg").close();
+
+        }
+
+    };
+
+}
+
+
+// =====================================================
+// TOMBOL CLOSE DIALOG
+// =====================================================
+
+if($("closeDlg")){
+
+    $("closeDlg").onclick =
+    function(e){
+
+        e.preventDefault();
+
+
+        $("vehicleForm").reset();
+
+        $("id").value = "";
+
+        $("formMsg").textContent = "";
+
+
+        if($("dlg").open){
+
+            $("dlg").close();
+
+        }
+
+    };
+
+}
 
 
 // =====================================================
@@ -603,6 +930,7 @@ async function(id){
     if(!confirm(
         "Apakah kendaraan ini benar-benar ingin dihapus?"
     )){
+
         return;
     }
 
@@ -611,15 +939,19 @@ async function(id){
         await sb
             .from("kendaraan")
             .delete()
-            .eq("id",id);
+            .eq(
+                "id",
+                id
+            );
 
 
     if(result.error){
 
-        alert(result.error.message);
+        alert(
+            result.error.message
+        );
 
         return;
-
     }
 
 
@@ -634,54 +966,75 @@ async function(id){
 
 function renderDocuments(){
 
+    if(!$("documentTable"))
+        return;
+
+
     if(!data.length){
 
         $("documentTable").innerHTML = `
 
             <tr>
+
                 <td colspan="4">
+
                     <div class="empty">
                         Belum ada data kendaraan.
                     </div>
+
                 </td>
+
             </tr>
 
         `;
 
         return;
-
     }
 
 
     $("documentTable").innerHTML =
+
         data.map(v => `
 
             <tr>
 
                 <td>
+
                     <strong>
+
                         ${escapeHtml(
                             v.nomor_polisi || "-"
                         )}
+
                     </strong>
+
                 </td>
 
+
                 <td>
+
                     <span class="badge badge-orange">
                         Belum tersedia
                     </span>
+
                 </td>
 
+
                 <td>
+
                     <span class="badge badge-orange">
                         Belum tersedia
                     </span>
+
                 </td>
 
+
                 <td>
+
                     <span class="badge badge-orange">
                         Belum tersedia
                     </span>
+
                 </td>
 
             </tr>
@@ -723,7 +1076,6 @@ async function loadMaintenance(){
         maintenanceData = [];
 
         return;
-
     }
 
 
@@ -734,6 +1086,10 @@ async function loadMaintenance(){
 
 
 function renderMaintenance(){
+
+    if(!$("maintenanceTable"))
+        return;
+
 
     if(!maintenanceData.length){
 
@@ -751,7 +1107,7 @@ function renderMaintenance(){
                         <br><br>
 
                         Data akan muncul setelah
-                        tabel pemeliharaan dibuat.
+                        tabel pemeliharaan tersedia.
 
                     </div>
 
@@ -762,11 +1118,11 @@ function renderMaintenance(){
         `;
 
         return;
-
     }
 
 
     $("maintenanceTable").innerHTML =
+
         maintenanceData.map(m => `
 
             <tr>
@@ -775,28 +1131,40 @@ function renderMaintenance(){
                     ${formatDate(m.tanggal)}
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         m.kendaraan?.nomor_polisi || "-"
                     )}
+
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         m.jenis || "-"
                     )}
+
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         m.keterangan || "-"
                     )}
+
                 </td>
 
+
                 <td>
+
                     Rp ${Number(
                         m.biaya || 0
                     ).toLocaleString("id-ID")}
+
                 </td>
 
             </tr>
@@ -812,12 +1180,25 @@ function renderMaintenance(){
 
 function renderDueDates(){
 
+    if(!$("dueList"))
+        return;
+
+
     const today =
         new Date();
 
 
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
     const limit =
-        new Date();
+        new Date(today);
+
 
     limit.setDate(
         limit.getDate() + 90
@@ -828,13 +1209,25 @@ function renderDueDates(){
         data.filter(v => {
 
             if(!v.tanggal_perpanjangan){
+
                 return false;
+
             }
+
 
             const date =
                 new Date(
                     v.tanggal_perpanjangan
                 );
+
+
+            date.setHours(
+                0,
+                0,
+                0,
+                0
+            );
+
 
             return (
                 date >= today &&
@@ -859,11 +1252,11 @@ function renderDueDates(){
         `;
 
         return;
-
     }
 
 
     $("dueList").innerHTML =
+
         due.map(v => {
 
             const date =
@@ -871,10 +1264,19 @@ function renderDueDates(){
                     v.tanggal_perpanjangan
                 );
 
+
             const diff =
                 Math.ceil(
-                    (date - today) /
-                    (1000 * 60 * 60 * 24)
+                    (
+                        date - today
+                    )
+                    /
+                    (
+                        1000 *
+                        60 *
+                        60 *
+                        24
+                    )
                 );
 
 
@@ -883,22 +1285,31 @@ function renderDueDates(){
                 <div class="info-box">
 
                     <strong>
+
                         ${escapeHtml(
                             v.nomor_polisi || "-"
                         )}
+
                     </strong>
 
+
                     <span>
+
                         ${escapeHtml(
                             v.merk_tipe || "-"
                         )}
+
                         · Jatuh tempo
+
                         ${formatDate(
                             v.tanggal_perpanjangan
                         )}
+
                     </span>
 
+
                     <br>
+
 
                     <span class="badge ${
                         diff <= 30
@@ -920,13 +1331,15 @@ function renderDueDates(){
 
 
 // =====================================================
-// HELPER
+// FORMAT TANGGAL
 // =====================================================
 
 function formatDate(value){
 
     if(!value){
+
         return "-";
+
     }
 
 
@@ -935,7 +1348,9 @@ function formatDate(value){
 
 
     if(isNaN(date)){
+
         return value;
+
     }
 
 
@@ -951,14 +1366,35 @@ function formatDate(value){
 }
 
 
+// =====================================================
+// SECURITY / ESCAPE HTML
+// =====================================================
+
 function escapeHtml(value){
 
-    return String(value ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+    return String(
+        value ?? ""
+    )
+    .replaceAll(
+        "&",
+        "&amp;"
+    )
+    .replaceAll(
+        "<",
+        "&lt;"
+    )
+    .replaceAll(
+        ">",
+        "&gt;"
+    )
+    .replaceAll(
+        '"',
+        "&quot;"
+    )
+    .replaceAll(
+        "'",
+        "&#039;"
+    );
 
 }
 
@@ -967,67 +1403,87 @@ function escapeHtml(value){
 // EVENT LOGIN
 // =====================================================
 
-$("loginForm").onsubmit =
-async function(e){
+if($("loginForm")){
 
-    e.preventDefault();
+    $("loginForm").onsubmit =
+    async function(e){
 
-    $("msg").textContent =
-        "Sedang masuk...";
-
-
-    const success =
-        await loginUser(
-            $("email").value.trim(),
-            $("password").value
-        );
+        e.preventDefault();
 
 
-    if(success){
+        $("msg").textContent =
+            "Sedang masuk...";
 
-        $("msg").textContent = "";
 
-        showApp();
+        const success =
+            await loginUser(
+                $("email").value.trim(),
+                $("password").value
+            );
 
-        const session =
-            await sb.auth.getSession();
 
-        if(session.data.session){
+        if(success){
 
-            const email =
-                session.data.session.user.email;
+            $("msg").textContent = "";
 
-            $("userEmail").textContent =
-                email;
 
-            $("dashboardEmail").textContent =
-                email;
+            showApp();
 
-            $("profileEmail").textContent =
-                email;
+
+            const session =
+                await sb.auth.getSession();
+
+
+            if(session.data.session){
+
+                const email =
+                    session.data.session.user.email;
+
+
+                if($("userEmail"))
+                    $("userEmail").textContent =
+                        email;
+
+
+                if($("dashboardEmail"))
+                    $("dashboardEmail").textContent =
+                        email;
+
+
+                if($("profileEmail"))
+                    $("profileEmail").textContent =
+                        email;
+
+            }
+
+
+            await loadVehicles();
+
+            await loadMaintenance();
+
+            openPage("dashboard");
 
         }
 
-        await loadVehicles();
-        await loadMaintenance();
+    };
 
-        openPage("dashboard");
-
-    }
-
-};
+}
 
 
 // =====================================================
 // LOGOUT
 // =====================================================
 
-$("logout").onclick =
-async function(){
+if($("logout")){
 
-    await logoutUser();
+    $("logout").onclick =
+    async function(){
 
-};
+        await logoutUser();
+
+    };
+
+}
 
 
 // =====================================================
@@ -1040,7 +1496,7 @@ document
 
         btn.addEventListener(
             "click",
-            () => {
+            function(){
 
                 openPage(
                     btn.dataset.page
@@ -1053,63 +1509,81 @@ document
 
 
 // =====================================================
-// BUTTON
+// BUTTON TAMBAH
 // =====================================================
 
-$("add").onclick =
-openAddVehicle;
+if($("add")){
 
-$("dashboardAdd").onclick =
-openAddVehicle;
+    $("add").onclick =
+        openAddVehicle;
 
-
-$("batal").onclick =
-function(){
-
-    $("dlg").close();
-
-};
+}
 
 
-$("closeDlg").onclick =
-function(){
+if($("dashboardAdd")){
 
-    $("dlg").close();
+    $("dashboardAdd").onclick =
+        openAddVehicle;
 
-};
+}
 
 
-$("refresh").onclick =
-async function(){
+// =====================================================
+// REFRESH
+// =====================================================
 
-    await loadVehicles();
+if($("refresh")){
 
-};
+    $("refresh").onclick =
+    async function(){
+
+        await loadVehicles();
+
+    };
+
+}
 
 
 // =====================================================
 // SEARCH
 // =====================================================
 
-$("search").oninput =
-renderVehicles;
+if($("search")){
 
-$("filter").onchange =
-renderVehicles;
+    $("search").oninput =
+        renderVehicles;
+
+}
+
+
+if($("filter")){
+
+    $("filter").onchange =
+        renderVehicles;
+
+}
 
 
 // =====================================================
 // MOBILE MENU
 // =====================================================
 
-$("mobileMenu").onclick =
-function(){
+if($("mobileMenu")){
 
-    $("sidebar").classList.toggle(
-        "open"
-    );
+    $("mobileMenu").onclick =
+    function(){
 
-};
+        if($("sidebar")){
+
+            $("sidebar").classList.toggle(
+                "open"
+            );
+
+        }
+
+    };
+
+}
 
 
 // =====================================================
@@ -1117,31 +1591,40 @@ function(){
 // =====================================================
 
 sb.auth.onAuthStateChange(
-async function(event, session){
+    async function(event, session){
 
-    if(session){
+        if(session){
 
-        showApp();
+            showApp();
 
-        const email =
-            session.user.email;
 
-        $("userEmail").textContent =
-            email;
+            const email =
+                session.user.email;
 
-        $("dashboardEmail").textContent =
-            email;
 
-        $("profileEmail").textContent =
-            email;
+            if($("userEmail"))
+                $("userEmail").textContent =
+                    email;
 
-    }else{
 
-        showLogin();
+            if($("dashboardEmail"))
+                $("dashboardEmail").textContent =
+                    email;
+
+
+            if($("profileEmail"))
+                $("profileEmail").textContent =
+                    email;
+
+
+        }else{
+
+            showLogin();
+
+        }
 
     }
-
-});
+);
 
 
 // =====================================================
@@ -1158,17 +1641,24 @@ async function(event, session){
 
         showApp();
 
+
         const email =
             result.data.session.user.email;
 
-        $("userEmail").textContent =
-            email;
 
-        $("dashboardEmail").textContent =
-            email;
+        if($("userEmail"))
+            $("userEmail").textContent =
+                email;
 
-        $("profileEmail").textContent =
-            email;
+
+        if($("dashboardEmail"))
+            $("dashboardEmail").textContent =
+                email;
+
+
+        if($("profileEmail"))
+            $("profileEmail").textContent =
+                email;
 
 
         await loadVehicles();
@@ -1176,6 +1666,7 @@ async function(event, session){
         await loadMaintenance();
 
         openPage("dashboard");
+
 
     }else{
 
