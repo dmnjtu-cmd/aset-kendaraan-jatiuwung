@@ -1,1116 +1,165 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Asset Kendaraan Jatiuwung</title>
 
+<link rel="stylesheet" href="styles.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-:root{
-    --primary:#2563eb;
-    --primary-dark:#1d4ed8;
-    --bg:#f5f7fb;
-    --card:#ffffff;
-    --text:#172033;
-    --muted:#64748b;
-    --border:#e2e8f0;
-    --danger:#dc2626;
-    --success:#16a34a;
-    --warning:#d97706;
-}
-
-body{
-    font-family:Arial,Helvetica,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-}
-
-/* ================= LOGIN ================= */
-
-#login{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:
-        linear-gradient(135deg,#eff6ff 0%,#f8fafc 50%,#eef2ff 100%);
-}
-
-#login[hidden],
-#app[hidden]{
-    display:none !important;
-}
-
-.login-card{
-    width:100%;
-    max-width:430px;
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:36px;
-    box-shadow:0 20px 50px rgba(15,23,42,.08);
-}
-
-.login-logo{
-    width:58px;
-    height:58px;
-    background:var(--primary);
-    color:#fff;
-    border-radius:14px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:25px;
-    font-weight:700;
-    margin-bottom:20px;
-}
-
-.login-card h1{
-    font-size:27px;
-    line-height:1.2;
-    margin-bottom:8px;
-}
-
-.login-card .subtitle{
-    color:var(--muted);
-    margin-bottom:28px;
-}
-
-label{
-    display:block;
-    font-size:13px;
-    font-weight:600;
-    margin-bottom:7px;
-}
-
-input,
-select,
-textarea{
-    width:100%;
-    border:1px solid var(--border);
-    border-radius:9px;
-    padding:12px 13px;
-    font-size:14px;
-    outline:none;
-    background:#fff;
-    color:var(--text);
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-    border-color:var(--primary);
-    box-shadow:0 0 0 3px rgba(37,99,235,.10);
-}
-
-.form-group{
-    margin-bottom:16px;
-}
-
-.btn{
-    border:0;
-    border-radius:9px;
-    padding:11px 16px;
-    cursor:pointer;
-    font-weight:600;
-    font-size:14px;
-}
-
-.btn-primary{
-    background:var(--primary);
-    color:#fff;
-}
-
-.btn-primary:hover{
-    background:var(--primary-dark);
-}
-
-.btn-secondary{
-    background:#f1f5f9;
-    color:#334155;
-}
-
-.btn-danger{
-    background:#fee2e2;
-    color:#b91c1c;
-}
-
-.btn-success{
-    background:#dcfce7;
-    color:#15803d;
-}
-
-.btn-full{
-    width:100%;
-}
-
-.message{
-    margin-top:12px;
-    font-size:13px;
-    color:var(--danger);
-}
-
-/* ================= APP ================= */
-
-#app{
-    min-height:100vh;
-}
-
-.app-layout{
-    display:flex;
-    min-height:100vh;
-}
-
-/* SIDEBAR */
-
-.sidebar{
-    width:250px;
-    background:#0f172a;
-    color:#fff;
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    z-index:20;
-    display:flex;
-    flex-direction:column;
-}
-
-.brand{
-    padding:22px 20px;
-    border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.brand-title{
-    font-size:17px;
-    font-weight:700;
-}
-
-.brand-subtitle{
-    font-size:11px;
-    color:#94a3b8;
-    margin-top:5px;
-}
-
-.menu{
-    padding:18px 12px;
-    flex:1;
-}
-
-.menu-title{
-    color:#64748b;
-    font-size:10px;
-    font-weight:700;
-    text-transform:uppercase;
-    padding:12px 12px 7px;
-}
-
-.menu button{
-    width:100%;
-    border:0;
-    background:transparent;
-    color:#cbd5e1;
-    text-align:left;
-    padding:12px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:13px;
-    margin-bottom:3px;
-}
-
-.menu button:hover{
-    background:#1e293b;
-    color:#fff;
-}
-
-.menu button.active{
-    background:var(--primary);
-    color:#fff;
-}
-
-.sidebar-footer{
-    padding:15px;
-    border-top:1px solid rgba(255,255,255,.08);
-}
-
-.sidebar-footer button{
-    width:100%;
-}
-
-/* MAIN */
-
-.main{
-    margin-left:250px;
-    width:calc(100% - 250px);
-    min-height:100vh;
-}
-
-.topbar{
-    height:70px;
-    background:#fff;
-    border-bottom:1px solid var(--border);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 30px;
-    position:sticky;
-    top:0;
-    z-index:10;
-}
-
-.topbar-title{
-    font-size:17px;
-    font-weight:700;
-}
-
-.user-info{
-    font-size:13px;
-    color:var(--muted);
-}
-
-.content{
-    padding:30px;
-    max-width:1500px;
-}
-
-/* PAGES */
-
-.page{
-    display:none;
-}
-
-.page.active{
-    display:block;
-}
-
-.page-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:20px;
-    margin-bottom:24px;
-}
-
-.page-header h1{
-    font-size:25px;
-}
-
-.page-header p{
-    color:var(--muted);
-    font-size:13px;
-    margin-top:5px;
-}
-
-/* CARDS */
-
-.stats{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:16px;
-    margin-bottom:22px;
-}
-
-.stat-card{
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:13px;
-    padding:20px;
-}
-
-.stat-label{
-    font-size:13px;
-    color:var(--muted);
-}
-
-.stat-number{
-    font-size:27px;
-    font-weight:700;
-    margin-top:9px;
-}
-
-/* CONTENT CARD */
-
-.card{
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:13px;
-    padding:20px;
-    margin-bottom:20px;
-}
-
-.card-title{
-    font-size:16px;
-    font-weight:700;
-    margin-bottom:16px;
-}
-
-/* SEARCH */
-
-.search-area{
-    display:grid;
-    grid-template-columns:1fr 180px auto;
-    gap:10px;
-    margin-bottom:18px;
-}
-
-/* TABLE */
-
-.table-wrap{
-    overflow-x:auto;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:850px;
-}
-
-th{
-    background:#f8fafc;
-    color:#475569;
-    font-size:12px;
-    text-align:left;
-    padding:12px;
-    border-bottom:1px solid var(--border);
-}
-
-td{
-    padding:13px 12px;
-    border-bottom:1px solid var(--border);
-    font-size:13px;
-}
-
-tr:hover td{
-    background:#fafcff;
-}
-
-.badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:600;
-}
-
-.badge-blue{
-    background:#dbeafe;
-    color:#1d4ed8;
-}
-
-.badge-green{
-    background:#dcfce7;
-    color:#15803d;
-}
-
-.badge-orange{
-    background:#ffedd5;
-    color:#c2410c;
-}
-
-.badge-red{
-    background:#fee2e2;
-    color:#b91c1c;
-}
-
-.actions{
-    display:flex;
-    gap:5px;
-}
-
-/* EMPTY */
-
-.empty{
-    text-align:center;
-    padding:45px 20px;
-    color:var(--muted);
-    font-size:14px;
-}
-
-/* DASHBOARD */
-
-.dashboard-grid{
-    display:grid;
-    grid-template-columns:2fr 1fr;
-    gap:20px;
-}
-
-.info-box{
-    background:#f8fafc;
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:10px;
-}
-
-.info-box strong{
-    display:block;
-    margin-bottom:5px;
-}
-
-/* MODAL */
-
-dialog{
-    border:0;
-    border-radius:15px;
-    width:min(700px,94vw);
-    padding:0;
-    box-shadow:0 25px 70px rgba(15,23,42,.25);
-}
-
-dialog::backdrop{
-    background:rgba(15,23,42,.5);
-}
-
-.modal-header{
-    padding:20px 22px;
-    border-bottom:1px solid var(--border);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.modal-header h2{
-    font-size:18px;
-}
-
-.modal-body{
-    padding:22px;
-    max-height:70vh;
-    overflow-y:auto;
-}
-
-.modal-footer{
-    padding:16px 22px;
-    border-top:1px solid var(--border);
-    display:flex;
-    justify-content:flex-end;
-    gap:8px;
-}
-
-.form-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-}
-
-.full{
-    grid-column:1/-1;
-}
-
-/* MOBILE */
-
-.mobile-menu{
-    display:none;
-}
-
-@media(max-width:900px){
-
-    .sidebar{
-        transform:translateX(-100%);
-        transition:.2s;
-    }
-
-    .sidebar.open{
-        transform:translateX(0);
-    }
-
-    .main{
-        margin-left:0;
-        width:100%;
-    }
-
-    .mobile-menu{
-        display:block;
-        margin-right:12px;
-        background:none;
-        border:0;
-        font-size:22px;
-        cursor:pointer;
-    }
-
-    .topbar{
-        padding:0 16px;
-    }
-
-    .content{
-        padding:18px;
-    }
-
-    .stats{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .dashboard-grid{
-        grid-template-columns:1fr;
-    }
-
-    .search-area{
-        grid-template-columns:1fr;
-    }
-}
-
-@media(max-width:600px){
-
-    .stats{
-        grid-template-columns:1fr;
-    }
-
-    .page-header{
-        align-items:flex-start;
-        flex-direction:column;
-    }
-
-    .form-grid{
-        grid-template-columns:1fr;
-    }
-
-    .login-card{
-        padding:25px;
-    }
-}
-</style>
 </head>
 
 <body>
 
-<!-- ================= LOGIN ================= -->
+<!-- =====================================================
+     LOGIN
+     ===================================================== -->
 
-<section id="login">
+<div id="login" class="center">
 
-    <div class="login-card">
-
-        <div class="login-logo">AJ</div>
+    <div class="card auth">
 
         <h1>Asset Kendaraan Jatiuwung</h1>
 
-        <p class="subtitle">
-            Sistem Informasi Pengelolaan Aset Kendaraan
-        </p>
+        <p>Login Admin</p>
 
         <form id="loginForm">
 
-            <div class="form-group">
-                <label>Email Admin</label>
-                <input
-                    id="email"
-                    type="email"
-                    placeholder="Masukkan email"
-                    required
-                >
-            </div>
+            <input
+                id="email"
+                type="email"
+                placeholder="Email"
+                required
+            >
 
-            <div class="form-group">
-                <label>Password</label>
-                <input
-                    id="password"
-                    type="password"
-                    placeholder="Masukkan password"
-                    required
-                >
-            </div>
+            <input
+                id="password"
+                type="password"
+                placeholder="Password"
+                required
+            >
 
-            <button class="btn btn-primary btn-full" type="submit">
+            <button type="submit">
                 Masuk
             </button>
 
-            <div id="msg" class="message"></div>
+            <small id="msg"></small>
 
         </form>
 
     </div>
 
-</section>
+</div>
 
 
-<!-- ================= APP ================= -->
+<!-- =====================================================
+     APLIKASI
+     ===================================================== -->
 
-<section id="app" hidden>
+<div id="app" hidden>
 
-<div class="app-layout">
+    <header>
 
-    <!-- SIDEBAR -->
+        <b>Asset Kendaraan Jatiuwung</b>
 
-    <aside class="sidebar" id="sidebar">
+        <button id="logout">
+            Keluar
+        </button>
 
-        <div class="brand">
-            <div class="brand-title">
-                Asset Kendaraan
+    </header>
+
+
+    <main>
+
+        <div class="head">
+
+            <div>
+
+                <h1>
+                    Dashboard Kendaraan
+                </h1>
+
+                <p>
+                    Kelola Mobil, Motor, dan Bentor/Roda Tiga.
+                </p>
+
             </div>
 
-            <div class="brand-subtitle">
-                Kecamatan Jatiuwung
-            </div>
-        </div>
-
-        <div class="menu">
-
-            <div class="menu-title">
-                Utama
-            </div>
-
-            <button class="menu-btn active" data-page="dashboard">
-                Dashboard
-            </button>
-
-            <button class="menu-btn" data-page="kendaraan">
-                Data Kendaraan
-            </button>
-
-            <div class="menu-title">
-                Pengelolaan
-            </div>
-
-            <button class="menu-btn" data-page="dokumen">
-                Dokumen Kendaraan
-            </button>
-
-            <button class="menu-btn" data-page="pemeliharaan">
-                Pemeliharaan & Suku Cadang
-            </button>
-
-            <button class="menu-btn" data-page="jatuh-tempo">
-                Jatuh Tempo
-            </button>
-
-            <div class="menu-title">
-                Sistem
-            </div>
-
-            <button class="menu-btn" data-page="profil">
-                Profil Admin
+            <button id="add">
+                + Tambah Kendaraan
             </button>
 
         </div>
 
-        <div class="sidebar-footer">
 
-            <button id="logout" class="btn btn-danger">
-                Keluar
-            </button>
+        <!-- =================================================
+             STATISTIK
+             ================================================= -->
+
+        <div class="stats">
+
+            <div>
+                Mobil
+                <b id="mobil">0</b>
+            </div>
+
+            <div>
+                Motor
+                <b id="motor">0</b>
+            </div>
+
+            <div>
+                Bentor
+                <b id="bentor">0</b>
+            </div>
+
+            <div>
+                Total
+                <b id="total">0</b>
+            </div>
 
         </div>
 
-    </aside>
 
+        <!-- =================================================
+             DATA KENDARAAN
+             ================================================= -->
 
-    <!-- MAIN -->
+        <div class="card">
 
-    <main class="main">
+            <div class="filters">
 
-        <header class="topbar">
-
-            <div style="display:flex;align-items:center;">
-
-                <button
-                    id="mobileMenu"
-                    class="mobile-menu"
+                <input
+                    id="search"
+                    placeholder="Cari nomor polisi, nama atau merk..."
                 >
-                    ☰
-                </button>
 
-                <div class="topbar-title" id="topTitle">
-                    Dashboard
-                </div>
+                <select id="filter">
+
+                    <option value="">
+                        Semua jenis
+                    </option>
+
+                    <option value="Mobil">
+                        Mobil
+                    </option>
+
+                    <option value="Motor">
+                        Motor
+                    </option>
+
+                    <option value="Bentor">
+                        Bentor
+                    </option>
+
+                </select>
 
             </div>
 
-            <div class="user-info" id="userEmail">
-                Admin
-            </div>
-
-        </header>
-
-
-        <div class="content">
-
-            <!-- ================= DASHBOARD ================= -->
-
-            <section
-                id="page-dashboard"
-                class="page active"
-            >
-
-                <div class="page-header">
-
-                    <div>
-                        <h1>Dashboard Kendaraan</h1>
-
-                        <p>
-                            Ringkasan aset kendaraan Kecamatan Jatiuwung
-                        </p>
-                    </div>
-
-                    <button
-                        class="btn btn-primary"
-                        id="dashboardAdd"
-                    >
-                        + Tambah Kendaraan
-                    </button>
-
-                </div>
-
-
-                <div class="stats">
-
-                    <div class="stat-card">
-                        <div class="stat-label">Mobil</div>
-                        <div class="stat-number" id="mobil">0</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-label">Motor</div>
-                        <div class="stat-number" id="motor">0</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-label">Bentor / Roda Tiga</div>
-                        <div class="stat-number" id="bentor">0</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-label">Total Kendaraan</div>
-                        <div class="stat-number" id="total">0</div>
-                    </div>
-
-                </div>
-
-
-                <div class="dashboard-grid">
-
-                    <div class="card">
-
-                        <div class="card-title">
-                            Kendaraan Terbaru
-                        </div>
-
-                        <div id="recentVehicles"></div>
-
-                    </div>
-
-
-                    <div class="card">
-
-                        <div class="card-title">
-                            Informasi Sistem
-                        </div>
-
-                        <div class="info-box">
-                            <strong>Status Database</strong>
-                            <span id="databaseStatus">
-                                Terhubung
-                            </span>
-                        </div>
-
-                        <div class="info-box">
-                            <strong>Login sebagai</strong>
-                            <span id="dashboardEmail">
-                                -
-                            </span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ================= KENDARAAN ================= -->
-
-            <section
-                id="page-kendaraan"
-                class="page"
-            >
-
-                <div class="page-header">
-
-                    <div>
-                        <h1>Data Kendaraan</h1>
-
-                        <p>
-                            Kelola data mobil, motor dan bentor
-                        </p>
-                    </div>
-
-                    <button
-                        class="btn btn-primary"
-                        id="add"
-                    >
-                        + Tambah Kendaraan
-                    </button>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="search-area">
-
-                        <input
-                            id="search"
-                            placeholder="Cari nomor polisi, nama pemegang, merk atau tipe..."
-                        >
-
-                        <select id="filter">
-
-                            <option value="">
-                                Semua Jenis
-                            </option>
-
-                            <option value="Mobil">
-                                Mobil
-                            </option>
-
-                            <option value="Motor">
-                                Motor
-                            </option>
-
-                            <option value="Bentor">
-                                Bentor / Roda Tiga
-                            </option>
-
-                        </select>
-
-                        <button
-                            class="btn btn-secondary"
-                            id="refresh"
-                        >
-                            Refresh
-                        </button>
-
-                    </div>
-
-
-                    <div class="table-wrap">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>No</th>
-                                    <th>Nomor Polisi</th>
-                                    <th>Jenis</th>
-                                    <th>Merk / Tipe</th>
-                                    <th>Pemegang</th>
-                                    <th>Tahun</th>
-                                    <th>Perpanjangan</th>
-                                    <th>Aksi</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="vehicleTable">
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ================= DOKUMEN ================= -->
-
-            <section
-                id="page-dokumen"
-                class="page"
-            >
-
-                <div class="page-header">
-
-                    <div>
-                        <h1>Dokumen Kendaraan</h1>
-
-                        <p>
-                            STNK, BPKB dan Berita Acara
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-                        Daftar Dokumen
-                    </div>
-
-                    <div class="table-wrap">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-                                    <th>Nomor Polisi</th>
-                                    <th>STNK</th>
-                                    <th>BPKB</th>
-                                    <th>Berita Acara</th>
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="documentTable">
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ================= PEMELIHARAAN ================= -->
-
-            <section
-                id="page-pemeliharaan"
-                class="page"
-            >
-
-                <div class="page-header">
-
-                    <div>
-                        <h1>Pemeliharaan & Suku Cadang</h1>
-
-                        <p>
-                            Riwayat servis dan penggantian suku cadang kendaraan
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-title">
-                        Riwayat Pemeliharaan
-                    </div>
-
-                    <div class="table-wrap">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Nomor Polisi</th>
-                                    <th>Jenis Pemeliharaan</th>
-                                    <th>Keterangan</th>
-                                    <th>Biaya</th>
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="maintenanceTable">
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ================= JATUH TEMPO ================= -->
-
-            <section
-                id="page-jatuh-tempo"
-                class="page"
-            >
-
-                <div class="page-header">
-
-                    <div>
-                        <h1>Jatuh Tempo</h1>
-
-                        <p>
-                            Monitoring masa berlaku kendaraan
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-                        Kendaraan yang Mendekati Jatuh Tempo
-                    </div>
-
-                    <div id="dueList">
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ================= PROFIL ================= -->
-
-            <section
-                id="page-profil"
-                class="page"
-            >
-
-                <div class="page-header">
-
-                    <div>
-                        <h1>Profil Admin</h1>
-
-                        <p>
-                            Informasi akun yang sedang digunakan
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="info-box">
-
-                        <strong>Email</strong>
-
-                        <span id="profileEmail">
-                            -
-                        </span>
-
-                    </div>
-
-                    <div class="info-box">
-
-                        <strong>Status</strong>
-
-                        <span>
-                            Administrator
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </section>
+            <div id="list"></div>
 
         </div>
 
@@ -1118,186 +167,169 @@ dialog::backdrop{
 
 </div>
 
-</section>
 
-
-<!-- ================= MODAL KENDARAAN ================= -->
+<!-- =====================================================
+     MODAL TAMBAH / EDIT KENDARAAN
+     ===================================================== -->
 
 <dialog id="dlg">
 
-    <div class="modal-header">
+    <form
+        id="vehicleForm"
+        class="card"
+    >
 
         <h2 id="dlgTitle">
             Tambah Kendaraan
         </h2>
 
-        <button
-            class="btn btn-secondary"
-            id="closeDlg"
-            type="button"
+
+        <!-- ID DATABASE -->
+
+        <input
+            id="id"
+            type="hidden"
         >
-            ✕
-        </button>
-
-    </div>
 
 
-    <form id="vehicleForm">
+        <!-- =================================================
+             DATA KENDARAAN
+             ================================================= -->
 
-        <div class="modal-body">
+        <select
+            id="jenis"
+            required
+        >
+
+            <option value="">
+                Jenis kendaraan
+            </option>
+
+            <option value="Mobil">
+                Mobil
+            </option>
+
+            <option value="Motor">
+                Motor
+            </option>
+
+            <option value="Bentor">
+                Bentor
+            </option>
+
+        </select>
+
+
+        <input
+            id="plat"
+            placeholder="Nomor Polisi"
+            required
+        >
+
+
+        <input
+            id="nama"
+            placeholder="Nama Pemegang"
+            required
+        >
+
+
+        <!-- =================================================
+             DATA PEGAWAI
+             ================================================= -->
+
+        <input
+            id="nip"
+            type="text"
+            placeholder="NIP Pegawai"
+        >
+
+
+        <input
+            id="jabatan"
+            type="text"
+            placeholder="Jabatan Pegawai"
+        >
+
+
+        <input
+            id="unit"
+            type="text"
+            placeholder="Unit Kerja"
+        >
+
+
+        <!-- =================================================
+             DATA KENDARAAN LANJUTAN
+             ================================================= -->
+
+        <input
+            id="merk"
+            placeholder="Merk & Tipe"
+        >
+
+
+        <input
+            id="tahun"
+            type="number"
+            placeholder="Tahun Pengadaan"
+        >
+
+
+        <input
+            id="rangka"
+            placeholder="Nomor Rangka"
+        >
+
+
+        <input
+            id="mesin"
+            placeholder="Nomor Mesin"
+        >
+
+
+        <!-- =================================================
+             TANGGAL
+             ================================================= -->
+
+        <label>
+
+            Tanggal Perpanjangan STNK
 
             <input
-                type="hidden"
-                id="id"
+                id="tempo"
+                type="date"
             >
 
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>Jenis Kendaraan</label>
-
-                    <select id="jenis" required>
-
-                        <option value="">
-                            Pilih jenis
-                        </option>
-
-                        <option value="Mobil">
-                            Mobil
-                        </option>
-
-                        <option value="Motor">
-                            Motor
-                        </option>
-
-                        <option value="Bentor">
-                            Bentor / Roda Tiga
-                        </option>
-
-                    </select>
-
-                </div>
+        </label>
 
 
-                <div class="form-group">
+        <label>
 
-                    <label>Nomor Polisi</label>
+            Tanggal Ganti Kaleng / Plat
 
-                    <input
-                        id="plat"
-                        placeholder="Contoh: B 1234 XYZ"
-                        required
-                    >
+            <input
+                id="kaleng"
+                type="date"
+            >
 
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Nama Pemegang</label>
-
-                    <input
-                        id="nama"
-                        placeholder="Nama pemegang kendaraan"
-                    >
-
-                </div>
+        </label>
 
 
-                <div class="form-group">
+        <!-- =================================================
+             TOMBOL
+             ================================================= -->
 
-                    <label>Merk / Tipe</label>
-
-                    <input
-                        id="merk"
-                        placeholder="Contoh: Toyota Avanza"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Tahun Pengadaan</label>
-
-                    <input
-                        id="tahun"
-                        type="number"
-                        min="1900"
-                        max="2100"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Nomor Rangka</label>
-
-                    <input
-                        id="rangka"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Nomor Mesin</label>
-
-                    <input
-                        id="mesin"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Tanggal Perpanjangan STNK</label>
-
-                    <input
-                        id="tempo"
-                        type="date"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Tanggal Ganti Kaleng</label>
-
-                    <input
-                        id="kaleng"
-                        type="date"
-                    >
-
-                </div>
-
-            </div>
-
-            <div
-                id="formMsg"
-                class="message"
-            ></div>
-
-        </div>
-
-
-        <div class="modal-footer">
+        <div class="actions">
 
             <button
-                class="btn btn-secondary"
-                id="batal"
                 type="button"
+                id="batal"
             >
                 Batal
             </button>
 
             <button
-                class="btn btn-primary"
                 type="submit"
             >
                 Simpan Kendaraan
@@ -1305,12 +337,20 @@ dialog::backdrop{
 
         </div>
 
+
+        <small id="formMsg"></small>
+
     </form>
 
 </dialog>
 
 
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
 <script src="app.js"></script>
 
 </body>
+
 </html>
