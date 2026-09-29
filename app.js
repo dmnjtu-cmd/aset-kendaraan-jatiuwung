@@ -1180,8 +1180,16 @@ function renderMaintenance(){
 
 function renderDueDates(){
 
-    if(!$("dueList"))
+    const box = $("dueList");
+
+    if(!box){
         return;
+    }
+
+
+    // =====================================================
+    // TANGGAL HARI INI
+    // =====================================================
 
     const today = new Date();
 
@@ -1192,177 +1200,260 @@ function renderDueDates(){
         0
     );
 
+
+    // =====================================================
+    // BATAS 90 HARI KE DEPAN
+    // =====================================================
+
     const limit = new Date(today);
 
     limit.setDate(
         limit.getDate() + 90
     );
 
+
+    // =====================================================
+    // FILTER KENDARAAN
+    // =====================================================
+
     const due = data
-        .filter(v => {
+        .filter(vehicle => {
 
-            if(!v.tanggal_perpanjangan){
+            const rawDate =
+                vehicle.tanggal_perpanjangan;
+
+
+            // Tidak ada tanggal
+            if(
+                rawDate === null ||
+                rawDate === undefined ||
+                rawDate === ""
+            ){
+
                 return false;
+
             }
 
-            const date = new Date(
-                v.tanggal_perpanjangan
-            );
 
-            if(isNaN(date.getTime())){
+            // Ubah tanggal database menjadi Date
+            const dueDate =
+                new Date(rawDate);
+
+
+            // Kalau tanggal tidak valid
+            if(
+                Number.isNaN(
+                    dueDate.getTime()
+                )
+            ){
+
                 return false;
+
             }
 
-            date.setHours(
+
+            dueDate.setHours(
                 0,
                 0,
                 0,
                 0
             );
 
+
             /*
-             * PENTING:
+             * PENTING
              *
-             * Tidak memakai:
-             * date >= today
+             * Jangan menggunakan:
+             *
+             * dueDate >= today
              *
              * karena kendaraan yang sudah
-             * lewat jatuh tempo harus tetap muncul.
+             * lewat jatuh tempo tidak akan muncul.
              *
-             * Yang ditampilkan:
+             * Kita tampilkan:
+             *
              * - sudah jatuh tempo
-             * - jatuh tempo hari ini
-             * - sampai 90 hari ke depan
+             * - hari ini
+             * - maksimal 90 hari ke depan
              */
 
-            return date <= limit;
-
-        })
-        .sort((a,b) => {
-
-            return new Date(
-                a.tanggal_perpanjangan
-            ) -
-            new Date(
-                b.tanggal_perpanjangan
-            );
+            return dueDate <= limit;
 
         });
 
-    if(!due.length){
 
-        $("dueList").innerHTML = `
+    // =====================================================
+    // URUTKAN DARI YANG PALING MENDESAK
+    // =====================================================
+
+    due.sort(
+        (a,b) => {
+
+            return (
+                new Date(
+                    a.tanggal_perpanjangan
+                ).getTime()
+            )
+            -
+            (
+                new Date(
+                    b.tanggal_perpanjangan
+                ).getTime()
+            );
+
+        }
+    );
+
+
+    // =====================================================
+    // TIDAK ADA DATA
+    // =====================================================
+
+    if(due.length === 0){
+
+        box.innerHTML = `
 
             <div class="empty">
 
-                Tidak ada kendaraan
-                yang perlu diperhatikan.
+                <strong>
+                    Tidak ada kendaraan
+                    yang perlu diperhatikan.
+                </strong>
 
                 <br><br>
 
                 Sistem memantau kendaraan
-                sampai 90 hari ke depan.
+                yang sudah jatuh tempo
+                dan sampai 90 hari ke depan.
 
             </div>
 
         `;
 
         return;
+
     }
 
-    $("dueList").innerHTML =
 
-        due.map(v => {
+    // =====================================================
+    // TAMPILKAN DATA
+    // =====================================================
 
-            const date = new Date(
-                v.tanggal_perpanjangan
-            );
+    box.innerHTML = due
+        .map(vehicle => {
 
-            date.setHours(
+
+            const dueDate =
+                new Date(
+                    vehicle.tanggal_perpanjangan
+                );
+
+
+            dueDate.setHours(
                 0,
                 0,
                 0,
                 0
             );
 
-            const diff = Math.ceil(
-                (
-                    date.getTime() -
-                    today.getTime()
-                )
-                /
-                (
-                    1000 *
-                    60 *
-                    60 *
-                    24
-                )
-            );
 
-            let statusText = "";
-            let badgeClass = "";
+            // Selisih hari
+            const diff =
+                Math.round(
+                    (
+                        dueDate.getTime()
+                        -
+                        today.getTime()
+                    )
+                    /
+                    (
+                        1000 *
+                        60 *
+                        60 *
+                        24
+                    )
+                );
 
 
-            // SUDAH LEWAT
+            let status = "";
+            let badge = "";
+
+
+            // =================================================
+            // SUDAH JATUH TEMPO
+            // =================================================
 
             if(diff < 0){
 
-                statusText =
-                    `Sudah jatuh tempo ${Math.abs(diff)} hari`;
+                status =
+                    "Sudah jatuh tempo " +
+                    Math.abs(diff) +
+                    " hari";
 
-                badgeClass =
+                badge =
                     "badge-red";
 
             }
 
 
+            // =================================================
             // HARI INI
+            // =================================================
 
             else if(diff === 0){
 
-                statusText =
+                status =
                     "Jatuh tempo hari ini";
 
-                badgeClass =
+                badge =
                     "badge-red";
 
             }
 
 
+            // =================================================
             // 1 - 30 HARI
+            // =================================================
 
             else if(diff <= 30){
 
-                statusText =
-                    `${diff} hari lagi`;
+                status =
+                    diff +
+                    " hari lagi";
 
-                badgeClass =
+                badge =
                     "badge-red";
 
             }
 
 
+            // =================================================
             // 31 - 60 HARI
+            // =================================================
 
             else if(diff <= 60){
 
-                statusText =
-                    `${diff} hari lagi`;
+                status =
+                    diff +
+                    " hari lagi";
 
-                badgeClass =
+                badge =
                     "badge-orange";
 
             }
 
 
+            // =================================================
             // 61 - 90 HARI
+            // =================================================
 
             else{
 
-                statusText =
-                    `${diff} hari lagi`;
+                status =
+                    diff +
+                    " hari lagi";
 
-                badgeClass =
+                badge =
                     "badge-blue";
 
             }
@@ -1375,7 +1466,7 @@ function renderDueDates(){
                     <strong>
 
                         ${escapeHtml(
-                            v.nomor_polisi || "-"
+                            vehicle.nomor_polisi || "-"
                         )}
 
                     </strong>
@@ -1384,13 +1475,13 @@ function renderDueDates(){
                     <span>
 
                         ${escapeHtml(
-                            v.merk_tipe || "-"
+                            vehicle.merk_tipe || "-"
                         )}
 
                         ·
 
                         ${escapeHtml(
-                            v.jenis_kendaraan || "-"
+                            vehicle.jenis_kendaraan || "-"
                         )}
 
                     </span>
@@ -1404,7 +1495,7 @@ function renderDueDates(){
                         Pemegang:
 
                         ${escapeHtml(
-                            v.nama_pemegang || "-"
+                            vehicle.nama_pemegang || "-"
                         )}
 
                     </span>
@@ -1420,7 +1511,7 @@ function renderDueDates(){
                         <strong>
 
                             ${formatDate(
-                                v.tanggal_perpanjangan
+                                vehicle.tanggal_perpanjangan
                             )}
 
                         </strong>
@@ -1433,10 +1524,10 @@ function renderDueDates(){
 
                     <span class="
                         badge
-                        ${badgeClass}
+                        ${badge}
                     ">
 
-                        ${statusText}
+                        ${status}
 
                     </span>
 
@@ -1444,7 +1535,8 @@ function renderDueDates(){
 
             `;
 
-        }).join("");
+        })
+        .join("");
 
 }
 // =====================================================
