@@ -1180,13 +1180,12 @@ function renderMaintenance(){
 
 function renderDueDates(){
 
+function renderDueDates(){
+
     if(!$("dueList"))
         return;
 
-
-    const today =
-        new Date();
-
+    const today = new Date();
 
     today.setHours(
         0,
@@ -1195,31 +1194,26 @@ function renderDueDates(){
         0
     );
 
-
-    const limit =
-        new Date(today);
-
+    const limit = new Date(today);
 
     limit.setDate(
         limit.getDate() + 90
     );
 
-
-    const due =
-        data.filter(v => {
+    const due = data
+        .filter(v => {
 
             if(!v.tanggal_perpanjangan){
-
                 return false;
-
             }
 
+            const date = new Date(
+                v.tanggal_perpanjangan
+            );
 
-            const date =
-                new Date(
-                    v.tanggal_perpanjangan
-                );
-
+            if(isNaN(date.getTime())){
+                return false;
+            }
 
             date.setHours(
                 0,
@@ -1228,14 +1222,25 @@ function renderDueDates(){
                 0
             );
 
+            /*
+             * Tampilkan kendaraan:
+             * - yang sudah jatuh tempo
+             * - yang jatuh tempo hari ini
+             * - yang akan jatuh tempo maksimal 90 hari
+             */
 
-            return (
-                date >= today &&
-                date <= limit
+            return date <= limit;
+
+        })
+        .sort((a, b) => {
+
+            return new Date(
+                a.tanggal_perpanjangan
+            ) - new Date(
+                b.tanggal_perpanjangan
             );
 
         });
-
 
     if(!due.length){
 
@@ -1244,8 +1249,12 @@ function renderDueDates(){
             <div class="empty">
 
                 Tidak ada kendaraan yang
-                mendekati jatuh tempo
-                dalam 90 hari.
+                perlu diperhatikan.
+
+                <br><br>
+
+                Sistem memantau jatuh tempo
+                sampai 90 hari ke depan.
 
             </div>
 
@@ -1254,31 +1263,83 @@ function renderDueDates(){
         return;
     }
 
-
     $("dueList").innerHTML =
 
         due.map(v => {
 
-            const date =
-                new Date(
-                    v.tanggal_perpanjangan
-                );
+            const date = new Date(
+                v.tanggal_perpanjangan
+            );
 
+            date.setHours(
+                0,
+                0,
+                0,
+                0
+            );
 
-            const diff =
-                Math.ceil(
-                    (
-                        date - today
-                    )
-                    /
-                    (
-                        1000 *
-                        60 *
-                        60 *
-                        24
-                    )
-                );
+            const diff = Math.ceil(
+                (
+                    date.getTime() -
+                    today.getTime()
+                )
+                /
+                (
+                    1000 *
+                    60 *
+                    60 *
+                    24
+                )
+            );
 
+            let statusText = "";
+            let badgeClass = "";
+
+            if(diff < 0){
+
+                statusText =
+                    `Sudah jatuh tempo ${Math.abs(diff)} hari`;
+
+                badgeClass =
+                    "badge-red";
+
+            }
+            else if(diff === 0){
+
+                statusText =
+                    "Jatuh tempo hari ini";
+
+                badgeClass =
+                    "badge-red";
+
+            }
+            else if(diff <= 30){
+
+                statusText =
+                    `${diff} hari lagi`;
+
+                badgeClass =
+                    "badge-red";
+
+            }
+            else if(diff <= 60){
+
+                statusText =
+                    `${diff} hari lagi`;
+
+                badgeClass =
+                    "badge-orange";
+
+            }
+            else{
+
+                statusText =
+                    `${diff} hari lagi`;
+
+                badgeClass =
+                    "badge-blue";
+
+            }
 
             return `
 
@@ -1292,32 +1353,53 @@ function renderDueDates(){
 
                     </strong>
 
-
                     <span>
 
                         ${escapeHtml(
                             v.merk_tipe || "-"
                         )}
 
-                        · Jatuh tempo
+                        ·
 
-                        ${formatDate(
-                            v.tanggal_perpanjangan
+                        ${escapeHtml(
+                            v.jenis_kendaraan || "-"
                         )}
 
                     </span>
 
+                    <br>
+
+                    <span>
+
+                        Pemegang:
+
+                        ${escapeHtml(
+                            v.nama_pemegang || "-"
+                        )}
+
+                    </span>
 
                     <br>
 
+                    <span>
 
-                    <span class="badge ${
-                        diff <= 30
-                        ? "badge-red"
-                        : "badge-orange"
-                    }">
+                        Jatuh tempo:
 
-                        ${diff} hari lagi
+                        <strong>
+
+                            ${formatDate(
+                                v.tanggal_perpanjangan
+                            )}
+
+                        </strong>
+
+                    </span>
+
+                    <br>
+
+                    <span class="badge ${badgeClass}">
+
+                        ${statusText}
 
                     </span>
 
@@ -1328,43 +1410,6 @@ function renderDueDates(){
         }).join("");
 
 }
-
-
-// =====================================================
-// FORMAT TANGGAL
-// =====================================================
-
-function formatDate(value){
-
-    if(!value){
-
-        return "-";
-
-    }
-
-
-    const date =
-        new Date(value);
-
-
-    if(isNaN(date)){
-
-        return value;
-
-    }
-
-
-    return date.toLocaleDateString(
-        "id-ID",
-        {
-            day:"2-digit",
-            month:"2-digit",
-            year:"numeric"
-        }
-    );
-
-}
-
 
 // =====================================================
 // SECURITY / ESCAPE HTML
