@@ -1180,8 +1180,6 @@ function renderMaintenance(){
 
 function renderDueDates(){
 
-function renderDueDates(){
-
     if(!$("dueList"))
         return;
 
@@ -1223,20 +1221,29 @@ function renderDueDates(){
             );
 
             /*
-             * Tampilkan kendaraan:
-             * - yang sudah jatuh tempo
-             * - yang jatuh tempo hari ini
-             * - yang akan jatuh tempo maksimal 90 hari
+             * PENTING:
+             *
+             * Tidak memakai:
+             * date >= today
+             *
+             * karena kendaraan yang sudah
+             * lewat jatuh tempo harus tetap muncul.
+             *
+             * Yang ditampilkan:
+             * - sudah jatuh tempo
+             * - jatuh tempo hari ini
+             * - sampai 90 hari ke depan
              */
 
             return date <= limit;
 
         })
-        .sort((a, b) => {
+        .sort((a,b) => {
 
             return new Date(
                 a.tanggal_perpanjangan
-            ) - new Date(
+            ) -
+            new Date(
                 b.tanggal_perpanjangan
             );
 
@@ -1248,12 +1255,12 @@ function renderDueDates(){
 
             <div class="empty">
 
-                Tidak ada kendaraan yang
-                perlu diperhatikan.
+                Tidak ada kendaraan
+                yang perlu diperhatikan.
 
                 <br><br>
 
-                Sistem memantau jatuh tempo
+                Sistem memantau kendaraan
                 sampai 90 hari ke depan.
 
             </div>
@@ -1295,6 +1302,9 @@ function renderDueDates(){
             let statusText = "";
             let badgeClass = "";
 
+
+            // SUDAH LEWAT
+
             if(diff < 0){
 
                 statusText =
@@ -1304,6 +1314,10 @@ function renderDueDates(){
                     "badge-red";
 
             }
+
+
+            // HARI INI
+
             else if(diff === 0){
 
                 statusText =
@@ -1313,6 +1327,10 @@ function renderDueDates(){
                     "badge-red";
 
             }
+
+
+            // 1 - 30 HARI
+
             else if(diff <= 30){
 
                 statusText =
@@ -1322,6 +1340,10 @@ function renderDueDates(){
                     "badge-red";
 
             }
+
+
+            // 31 - 60 HARI
+
             else if(diff <= 60){
 
                 statusText =
@@ -1331,6 +1353,10 @@ function renderDueDates(){
                     "badge-orange";
 
             }
+
+
+            // 61 - 90 HARI
+
             else{
 
                 statusText =
@@ -1340,6 +1366,7 @@ function renderDueDates(){
                     "badge-blue";
 
             }
+
 
             return `
 
@@ -1352,6 +1379,7 @@ function renderDueDates(){
                         )}
 
                     </strong>
+
 
                     <span>
 
@@ -1367,7 +1395,9 @@ function renderDueDates(){
 
                     </span>
 
+
                     <br>
+
 
                     <span>
 
@@ -1379,7 +1409,9 @@ function renderDueDates(){
 
                     </span>
 
+
                     <br>
+
 
                     <span>
 
@@ -1395,9 +1427,14 @@ function renderDueDates(){
 
                     </span>
 
+
                     <br>
 
-                    <span class="badge ${badgeClass}">
+
+                    <span class="
+                        badge
+                        ${badgeClass}
+                    ">
 
                         ${statusText}
 
@@ -1410,7 +1447,6 @@ function renderDueDates(){
         }).join("");
 
 }
-
 // =====================================================
 // SECURITY / ESCAPE HTML
 // =====================================================
