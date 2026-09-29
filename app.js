@@ -1178,6 +1178,10 @@ function renderMaintenance(){
 // JATUH TEMPO
 // =====================================================
 
+// =====================================================
+// JATUH TEMPO KENDARAAN
+// =====================================================
+
 function renderDueDates(){
 
     const box = $("dueList");
@@ -1202,129 +1206,319 @@ function renderDueDates(){
 
 
     // =====================================================
-    // BATAS 90 HARI KE DEPAN
+    // FUNGSI MEMBACA TANGGAL INPUT DATE
+    // Supaya tidak bergeser karena timezone
     // =====================================================
 
-    const limit = new Date(today);
+    function parseLocalDate(value){
 
-    limit.setDate(
-        limit.getDate() + 90
-    );
+        if(!value){
+            return null;
+        }
 
+        const parts =
+            String(value).split("-");
 
-    // =====================================================
-    // FILTER KENDARAAN
-    // =====================================================
+        if(parts.length !== 3){
+            return null;
+        }
 
-    const due = data
-        .filter(vehicle => {
+        const year =
+            Number(parts[0]);
 
-            const rawDate =
-                vehicle.tanggal_perpanjangan;
+        const month =
+            Number(parts[1]) - 1;
 
+        const day =
+            Number(parts[2]);
 
-            // Tidak ada tanggal
-            if(
-                rawDate === null ||
-                rawDate === undefined ||
-                rawDate === ""
-            ){
-
-                return false;
-
-            }
-
-
-            // Ubah tanggal database menjadi Date
-            const dueDate =
-                new Date(rawDate);
-
-
-            // Kalau tanggal tidak valid
-            if(
-                Number.isNaN(
-                    dueDate.getTime()
-                )
-            ){
-
-                return false;
-
-            }
-
-
-            dueDate.setHours(
-                0,
-                0,
-                0,
-                0
+        const date =
+            new Date(
+                year,
+                month,
+                day
             );
 
+        date.setHours(
+            0,
+            0,
+            0,
+            0
+        );
 
-            /*
-             * PENTING
-             *
-             * Jangan menggunakan:
-             *
-             * dueDate >= today
-             *
-             * karena kendaraan yang sudah
-             * lewat jatuh tempo tidak akan muncul.
-             *
-             * Kita tampilkan:
-             *
-             * - sudah jatuh tempo
-             * - hari ini
-             * - maksimal 90 hari ke depan
-             */
+        if(
+            isNaN(
+                date.getTime()
+            )
+        ){
+            return null;
+        }
 
-            return dueDate <= limit;
+        return date;
+    }
+
+
+    // =====================================================
+    // HITUNG SELISIH HARI
+    // =====================================================
+
+    function getDayDifference(date){
+
+        return Math.round(
+            (
+                date.getTime() -
+                today.getTime()
+            )
+            /
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            )
+        );
+
+    }
+
+
+    // =====================================================
+    // STATUS JATUH TEMPO
+    // =====================================================
+
+    function getStatus(diff){
+
+        if(diff < 0){
+
+            return {
+                text:
+                    "Sudah jatuh tempo " +
+                    Math.abs(diff) +
+                    " hari",
+
+                badge:
+                    "badge-red"
+            };
+
+        }
+
+
+        if(diff === 0){
+
+            return {
+                text:
+                    "Jatuh tempo hari ini",
+
+                badge:
+                    "badge-red"
+            };
+
+        }
+
+
+        if(diff <= 30){
+
+            return {
+                text:
+                    diff +
+                    " hari lagi",
+
+                badge:
+                    "badge-red"
+            };
+
+        }
+
+
+        if(diff <= 60){
+
+            return {
+                text:
+                    diff +
+                    " hari lagi",
+
+                badge:
+                    "badge-orange"
+            };
+
+        }
+
+
+        return {
+
+            text:
+                diff +
+                " hari lagi",
+
+            badge:
+                "badge-blue"
+
+        };
+
+    }
+
+
+    // =====================================================
+    // DATA PERPANJANGAN STNK
+    //
+    // Tampilkan:
+    // - sudah lewat
+    // - hari ini
+    // - sampai 90 hari ke depan
+    // =====================================================
+
+    const stnkDue =
+        data
+        .map(vehicle => {
+
+            const date =
+                parseLocalDate(
+                    vehicle.tanggal_perpanjangan
+                );
+
+            if(!date){
+                return null;
+            }
+
+            const diff =
+                getDayDifference(date);
+
+            return {
+                vehicle:
+                    vehicle,
+
+                date:
+                    date,
+
+                diff:
+                    diff
+            };
+
+        })
+        .filter(item => {
+
+            if(!item){
+                return false;
+            }
+
+            return (
+                item.diff <= 90
+            );
+
+        })
+        .sort((a,b) => {
+
+            return (
+                a.date.getTime() -
+                b.date.getTime()
+            );
 
         });
 
 
     // =====================================================
-    // URUTKAN DARI YANG PALING MENDESAK
+    // DATA GANTI KALENG / PLAT
+    //
+    // Tampilkan:
+    // - sudah lewat
+    // - hari ini
+    // - sampai 365 hari ke depan
     // =====================================================
 
-    due.sort(
-        (a,b) => {
+    const kalengDue =
+        data
+        .map(vehicle => {
+
+            const date =
+                parseLocalDate(
+                    vehicle.tanggal_ganti_kaleng
+                );
+
+            if(!date){
+                return null;
+            }
+
+            const diff =
+                getDayDifference(date);
+
+            return {
+                vehicle:
+                    vehicle,
+
+                date:
+                    date,
+
+                diff:
+                    diff
+            };
+
+        })
+        .filter(item => {
+
+            if(!item){
+                return false;
+            }
 
             return (
-                new Date(
-                    a.tanggal_perpanjangan
-                ).getTime()
-            )
-            -
-            (
-                new Date(
-                    b.tanggal_perpanjangan
-                ).getTime()
+                item.diff <= 365
             );
 
-        }
-    );
+        })
+        .sort((a,b) => {
+
+            return (
+                a.date.getTime() -
+                b.date.getTime()
+            );
+
+        });
 
 
     // =====================================================
-    // TIDAK ADA DATA
+    // RINGKASAN
     // =====================================================
 
-    if(due.length === 0){
+    const overdueCount =
+        stnkDue.filter(
+            item =>
+                item.diff < 0
+        ).length;
+
+
+    const soonCount =
+        stnkDue.filter(
+            item =>
+                item.diff >= 0 &&
+                item.diff <= 30
+        ).length;
+
+
+    const kalengCount =
+        kalengDue.length;
+
+
+    // =====================================================
+    // JIKA TIDAK ADA DATA
+    // =====================================================
+
+    if(
+        stnkDue.length === 0 &&
+        kalengDue.length === 0
+    ){
 
         box.innerHTML = `
 
             <div class="empty">
 
                 <strong>
-                    Tidak ada kendaraan
+                    Belum ada kendaraan
                     yang perlu diperhatikan.
                 </strong>
 
                 <br><br>
 
-                Sistem memantau kendaraan
-                yang sudah jatuh tempo
-                dan sampai 90 hari ke depan.
+                Sistem akan menghitung otomatis
+                berdasarkan tanggal perpanjangan
+                STNK dan tanggal ganti kaleng/plat.
 
             </div>
 
@@ -1336,207 +1530,321 @@ function renderDueDates(){
 
 
     // =====================================================
-    // TAMPILKAN DATA
+    // RENDER
     // =====================================================
 
-    box.innerHTML = due
-        .map(vehicle => {
+    box.innerHTML = `
+
+        <!-- RINGKASAN -->
+
+        <div style="
+            display:grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap:12px;
+            margin-bottom:24px;
+        ">
+
+            <div class="info-box">
+
+                <strong>
+                    ${overdueCount}
+                </strong>
+
+                <span>
+                    Sudah Jatuh Tempo
+                </span>
+
+            </div>
 
 
-            const dueDate =
-                new Date(
-                    vehicle.tanggal_perpanjangan
-                );
+            <div class="info-box">
+
+                <strong>
+                    ${soonCount}
+                </strong>
+
+                <span>
+                    STNK ≤ 30 Hari
+                </span>
+
+            </div>
 
 
-            dueDate.setHours(
-                0,
-                0,
-                0,
-                0
-            );
+            <div class="info-box">
+
+                <strong>
+                    ${kalengCount}
+                </strong>
+
+                <span>
+                    Ganti Kaleng / Plat
+                </span>
+
+            </div>
+
+        </div>
 
 
-            // Selisih hari
-            const diff =
-                Math.round(
-                    (
-                        dueDate.getTime()
-                        -
-                        today.getTime()
-                    )
-                    /
-                    (
-                        1000 *
-                        60 *
-                        60 *
-                        24
-                    )
-                );
+        <!-- =================================================
+             PERPANJANGAN STNK
+        ================================================== -->
+
+        <h3 style="
+            margin:0 0 14px 0;
+        ">
+
+            Perpanjangan STNK
+
+        </h3>
 
 
-            let status = "";
-            let badge = "";
+        ${
+            stnkDue.length === 0
+
+            ?
+
+            `
+                <div class="empty">
+
+                    Tidak ada kendaraan yang
+                    jatuh tempo dalam 90 hari.
+
+                </div>
+            `
+
+            :
+
+            stnkDue.map(item => {
+
+                const vehicle =
+                    item.vehicle;
+
+                const status =
+                    getStatus(
+                        item.diff
+                    );
 
 
-            // =================================================
-            // SUDAH JATUH TEMPO
-            // =================================================
+                return `
 
-            if(diff < 0){
-
-                status =
-                    "Sudah jatuh tempo " +
-                    Math.abs(diff) +
-                    " hari";
-
-                badge =
-                    "badge-red";
-
-            }
-
-
-            // =================================================
-            // HARI INI
-            // =================================================
-
-            else if(diff === 0){
-
-                status =
-                    "Jatuh tempo hari ini";
-
-                badge =
-                    "badge-red";
-
-            }
-
-
-            // =================================================
-            // 1 - 30 HARI
-            // =================================================
-
-            else if(diff <= 30){
-
-                status =
-                    diff +
-                    " hari lagi";
-
-                badge =
-                    "badge-red";
-
-            }
-
-
-            // =================================================
-            // 31 - 60 HARI
-            // =================================================
-
-            else if(diff <= 60){
-
-                status =
-                    diff +
-                    " hari lagi";
-
-                badge =
-                    "badge-orange";
-
-            }
-
-
-            // =================================================
-            // 61 - 90 HARI
-            // =================================================
-
-            else{
-
-                status =
-                    diff +
-                    " hari lagi";
-
-                badge =
-                    "badge-blue";
-
-            }
-
-
-            return `
-
-                <div class="info-box">
-
-                    <strong>
-
-                        ${escapeHtml(
-                            vehicle.nomor_polisi || "-"
-                        )}
-
-                    </strong>
-
-
-                    <span>
-
-                        ${escapeHtml(
-                            vehicle.merk_tipe || "-"
-                        )}
-
-                        ·
-
-                        ${escapeHtml(
-                            vehicle.jenis_kendaraan || "-"
-                        )}
-
-                    </span>
-
-
-                    <br>
-
-
-                    <span>
-
-                        Pemegang:
-
-                        ${escapeHtml(
-                            vehicle.nama_pemegang || "-"
-                        )}
-
-                    </span>
-
-
-                    <br>
-
-
-                    <span>
-
-                        Jatuh tempo:
+                    <div class="info-box"
+                        style="
+                            margin-bottom:12px;
+                        "
+                    >
 
                         <strong>
 
-                            ${formatDate(
-                                vehicle.tanggal_perpanjangan
+                            ${escapeHtml(
+                                vehicle.nomor_polisi
+                                || "-"
                             )}
 
                         </strong>
 
-                    </span>
+
+                        <span>
+
+                            ${escapeHtml(
+                                vehicle.merk_tipe
+                                || "-"
+                            )}
+
+                            ·
+
+                            ${escapeHtml(
+                                vehicle.jenis_kendaraan
+                                || "-"
+                            )}
+
+                        </span>
 
 
-                    <br>
+                        <br>
 
 
-                    <span class="
-                        badge
-                        ${badge}
-                    ">
+                        <span>
 
-                        ${status}
+                            Pemegang:
 
-                    </span>
+                            ${escapeHtml(
+                                vehicle.nama_pemegang
+                                || "-"
+                            )}
+
+                        </span>
+
+
+                        <br>
+
+
+                        <span>
+
+                            Tanggal Perpanjangan:
+
+                            <strong>
+
+                                ${formatDate(
+                                    vehicle.tanggal_perpanjangan
+                                )}
+
+                            </strong>
+
+                        </span>
+
+
+                        <br>
+
+
+                        <span class="
+                            badge
+                            ${status.badge}
+                        ">
+
+                            ${status.text}
+
+                        </span>
+
+                    </div>
+
+                `;
+
+            }).join("")
+
+        }
+
+
+        <!-- =================================================
+             GANTI KALENG / PLAT
+        ================================================== -->
+
+        <h3 style="
+            margin:28px 0 14px 0;
+        ">
+
+            Ganti Kaleng / Plat
+
+        </h3>
+
+
+        ${
+            kalengDue.length === 0
+
+            ?
+
+            `
+                <div class="empty">
+
+                    Belum ada kendaraan yang
+                    mendekati jadwal ganti
+                    kaleng / plat dalam 1 tahun.
 
                 </div>
+            `
 
-            `;
+            :
 
-        })
-        .join("");
+            kalengDue.map(item => {
+
+                const vehicle =
+                    item.vehicle;
+
+                const status =
+                    getStatus(
+                        item.diff
+                    );
+
+
+                return `
+
+                    <div class="info-box"
+                        style="
+                            margin-bottom:12px;
+                        "
+                    >
+
+                        <strong>
+
+                            ${escapeHtml(
+                                vehicle.nomor_polisi
+                                || "-"
+                            )}
+
+                        </strong>
+
+
+                        <span>
+
+                            ${escapeHtml(
+                                vehicle.merk_tipe
+                                || "-"
+                            )}
+
+                            ·
+
+                            ${escapeHtml(
+                                vehicle.jenis_kendaraan
+                                || "-"
+                            )}
+
+                        </span>
+
+
+                        <br>
+
+
+                        <span>
+
+                            Pemegang:
+
+                            ${escapeHtml(
+                                vehicle.nama_pemegang
+                                || "-"
+                            )}
+
+                        </span>
+
+
+                        <br>
+
+
+                        <span>
+
+                            Jadwal Ganti Kaleng / Plat:
+
+                            <strong>
+
+                                ${formatDate(
+                                    vehicle.tanggal_ganti_kaleng
+                                )}
+
+                            </strong>
+
+                        </span>
+
+
+                        <br>
+
+
+                        <span class="
+                            badge
+                            ${status.badge}
+                        ">
+
+                            ${status.text}
+
+                        </span>
+
+                    </div>
+
+                `;
+
+            }).join("")
+
+        }
+
+    `;
 
 }
 // =====================================================
