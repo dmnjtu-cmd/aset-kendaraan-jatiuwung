@@ -41,8 +41,10 @@ async function loginUser(email, password){
 
     if(result.error){
 
-        $("msg").textContent =
-            result.error.message;
+        if($("msg")){
+            $("msg").textContent =
+                result.error.message;
+        }
 
         return false;
     }
@@ -65,21 +67,31 @@ async function logoutUser(){
 
 function showLogin(){
 
-    $("login").hidden = false;
-    $("app").hidden = true;
+    if($("login")){
+        $("login").hidden = false;
+        $("login").style.display = "flex";
+    }
 
-    $("login").style.display = "flex";
-    $("app").style.display = "none";
+    if($("app")){
+        $("app").hidden = true;
+        $("app").style.display = "none";
+    }
+
 }
 
 
 function showApp(){
 
-    $("login").hidden = true;
-    $("app").hidden = false;
+    if($("login")){
+        $("login").hidden = true;
+        $("login").style.display = "none";
+    }
 
-    $("login").style.display = "none";
-    $("app").style.display = "block";
+    if($("app")){
+        $("app").hidden = false;
+        $("app").style.display = "block";
+    }
+
 }
 
 
@@ -92,15 +104,20 @@ function openPage(page){
     document
         .querySelectorAll(".page")
         .forEach(el => {
+
             el.classList.remove("active");
+
         });
 
 
     const target =
         $("page-" + page);
 
+
     if(target){
+
         target.classList.add("active");
+
     }
 
 
@@ -272,11 +289,14 @@ function renderDashboard(){
     if($("mobil"))
         $("mobil").textContent = mobil;
 
+
     if($("motor"))
         $("motor").textContent = motor;
 
+
     if($("bentor"))
         $("bentor").textContent = bentor;
+
 
     if($("total"))
         $("total").textContent = data.length;
@@ -292,25 +312,35 @@ function renderDashboard(){
 
     if(!recent.length){
 
-        $("recentVehicles").innerHTML =
-            `<div class="empty">
+        $("recentVehicles").innerHTML = `
+
+            <div class="empty">
+
                 Belum ada data kendaraan.
-             </div>`;
+
+            </div>
+
+        `;
 
         return;
+
     }
 
 
     $("recentVehicles").innerHTML =
+
         recent.map(v => `
 
             <div class="info-box">
 
                 <strong>
+
                     ${escapeHtml(
                         v.nomor_polisi || "-"
                     )}
+
                 </strong>
+
 
                 <span>
 
@@ -327,6 +357,7 @@ function renderDashboard(){
                     <br>
 
                     Pemegang:
+
                     ${escapeHtml(
                         v.nama_pemegang || "-"
                     )}
@@ -403,7 +434,9 @@ function renderVehicles(){
                 <td colspan="8">
 
                     <div class="empty">
+
                         Belum ada kendaraan.
+
                     </div>
 
                 </td>
@@ -413,6 +446,7 @@ function renderVehicles(){
         `;
 
         return;
+
     }
 
 
@@ -423,16 +457,20 @@ function renderVehicles(){
             <tr>
 
                 <td>
+
                     ${index + 1}
+
                 </td>
 
 
                 <td>
 
                     <strong>
+
                         ${escapeHtml(
                             v.nomor_polisi || "-"
                         )}
+
                     </strong>
 
                 </td>
@@ -542,14 +580,26 @@ function openAddVehicle(){
     $("id").value = "";
 
 
-    $("dlgTitle").textContent =
-        "Tambah Kendaraan";
+    if($("dlgTitle")){
+
+        $("dlgTitle").textContent =
+            "Tambah Kendaraan";
+
+    }
 
 
-    $("formMsg").textContent = "";
+    if($("formMsg")){
+
+        $("formMsg").textContent = "";
+
+    }
 
 
-    $("dlg").showModal();
+    if($("dlg")){
+
+        $("dlg").showModal();
+
+    }
 
 }
 
@@ -608,8 +658,6 @@ window.editVehicle = function(id){
         v.nomor_mesin || "";
 
 
-    // DATA PEMEGANG / PEGAWAI
-
     if($("nip"))
         $("nip").value =
             v.nip_pegawai || "";
@@ -625,8 +673,6 @@ window.editVehicle = function(id){
             v.unit_kerja || "";
 
 
-    // DATA PERPANJANGAN
-
     $("tempo").value =
         v.tanggal_perpanjangan || "";
 
@@ -635,14 +681,26 @@ window.editVehicle = function(id){
         v.tanggal_ganti_kaleng || "";
 
 
-    $("dlgTitle").textContent =
-        "Edit Kendaraan";
+    if($("dlgTitle")){
+
+        $("dlgTitle").textContent =
+            "Edit Kendaraan";
+
+    }
 
 
-    $("formMsg").textContent = "";
+    if($("formMsg")){
+
+        $("formMsg").textContent = "";
+
+    }
 
 
-    $("dlg").showModal();
+    if($("dlg")){
+
+        $("dlg").showModal();
+
+    }
 
 };
 
@@ -663,13 +721,7 @@ if($("vehicleForm")){
             "Menyimpan data...";
 
 
-        // =================================================
-        // AMBIL DATA FORM
-        // =================================================
-
         const payload = {
-
-            // DATA KENDARAAN
 
             jenis_kendaraan:
                 $("jenis").value,
@@ -699,8 +751,6 @@ if($("vehicleForm")){
                 $("mesin").value.trim(),
 
 
-            // DATA PEMEGANG / PEGAWAI
-
             nip_pegawai:
                 $("nip")
                 ? $("nip").value.trim()
@@ -717,8 +767,6 @@ if($("vehicleForm")){
                 : "",
 
 
-            // DATA PERPANJANGAN
-
             tanggal_perpanjangan:
                 $("tempo").value || null,
 
@@ -728,16 +776,13 @@ if($("vehicleForm")){
         };
 
 
-        // =================================================
-        // VALIDASI
-        // =================================================
-
         if(!payload.jenis_kendaraan){
 
             $("formMsg").textContent =
                 "Jenis kendaraan wajib dipilih.";
 
             return;
+
         }
 
 
@@ -747,6 +792,7 @@ if($("vehicleForm")){
                 "Nomor polisi wajib diisi.";
 
             return;
+
         }
 
 
@@ -756,12 +802,9 @@ if($("vehicleForm")){
                 "Nama pemegang kendaraan wajib diisi.";
 
             return;
+
         }
 
-
-        // =================================================
-        // SIMPAN / UPDATE
-        // =================================================
 
         let result;
 
@@ -769,8 +812,6 @@ if($("vehicleForm")){
         try{
 
             if($("id").value){
-
-                // UPDATE
 
                 result =
                     await sb
@@ -782,8 +823,6 @@ if($("vehicleForm")){
                         );
 
             }else{
-
-                // INSERT
 
                 result =
                     await sb
@@ -800,12 +839,9 @@ if($("vehicleForm")){
                 "Terjadi kesalahan saat menyimpan.";
 
             return;
+
         }
 
-
-        // =================================================
-        // ERROR DATABASE
-        // =================================================
 
         if(result.error){
 
@@ -819,14 +855,10 @@ if($("vehicleForm")){
                 "Gagal menyimpan: " +
                 result.error.message;
 
-
             return;
+
         }
 
-
-        // =================================================
-        // BERHASIL
-        // =================================================
 
         $("formMsg").textContent =
             "Data berhasil disimpan.";
@@ -838,7 +870,7 @@ if($("vehicleForm")){
         setTimeout(
             function(){
 
-                if($("dlg").open){
+                if($("dlg") && $("dlg").open){
 
                     $("dlg").close();
 
@@ -879,7 +911,7 @@ if($("batal")){
         $("formMsg").textContent = "";
 
 
-        if($("dlg").open){
+        if($("dlg") && $("dlg").open){
 
             $("dlg").close();
 
@@ -909,7 +941,7 @@ if($("closeDlg")){
         $("formMsg").textContent = "";
 
 
-        if($("dlg").open){
+        if($("dlg") && $("dlg").open){
 
             $("dlg").close();
 
@@ -932,6 +964,7 @@ async function(id){
     )){
 
         return;
+
     }
 
 
@@ -952,6 +985,7 @@ async function(id){
         );
 
         return;
+
     }
 
 
@@ -979,7 +1013,9 @@ function renderDocuments(){
                 <td colspan="4">
 
                     <div class="empty">
+
                         Belum ada data kendaraan.
+
                     </div>
 
                 </td>
@@ -989,6 +1025,7 @@ function renderDocuments(){
         `;
 
         return;
+
     }
 
 
@@ -1014,7 +1051,9 @@ function renderDocuments(){
                 <td>
 
                     <span class="badge badge-orange">
+
                         Belum tersedia
+
                     </span>
 
                 </td>
@@ -1023,7 +1062,9 @@ function renderDocuments(){
                 <td>
 
                     <span class="badge badge-orange">
+
                         Belum tersedia
+
                     </span>
 
                 </td>
@@ -1032,7 +1073,9 @@ function renderDocuments(){
                 <td>
 
                     <span class="badge badge-orange">
+
                         Belum tersedia
+
                     </span>
 
                 </td>
@@ -1076,6 +1119,7 @@ async function loadMaintenance(){
         maintenanceData = [];
 
         return;
+
     }
 
 
@@ -1118,6 +1162,7 @@ function renderMaintenance(){
         `;
 
         return;
+
     }
 
 
@@ -1128,14 +1173,19 @@ function renderMaintenance(){
             <tr>
 
                 <td>
-                    ${formatDate(m.tanggal)}
+
+                    ${formatDate(
+                        m.tanggal
+                    )}
+
                 </td>
 
 
                 <td>
 
                     ${escapeHtml(
-                        m.kendaraan?.nomor_polisi || "-"
+                        m.kendaraan?.nomor_polisi
+                        || "-"
                     )}
 
                 </td>
@@ -1177,25 +1227,67 @@ function renderMaintenance(){
 // =====================================================
 // JATUH TEMPO
 // =====================================================
-
-// =====================================================
-// JATUH TEMPO KENDARAAN
+//
+// PERBAIKAN UTAMA:
+//
+// 1. Tidak hanya tanggal >= hari ini.
+// 2. Kendaraan yang sudah lewat tetap muncul.
+// 3. Otomatis membuat #dueList jika belum ada.
+// 4. STNK dipantau sampai 90 hari.
+// 5. Ganti kaleng/plat dipantau sampai 365 hari.
 // =====================================================
 
 function renderDueDates(){
 
-    const box = $("dueList");
+    // =================================================
+    // CARI / BUAT WADAH JATUH TEMPO
+    // =================================================
+
+    let box =
+        $("dueList");
+
 
     if(!box){
-        return;
+
+        const page =
+            $("page-jatuh-tempo");
+
+
+        if(!page){
+
+            console.error(
+                "Halaman Jatuh Tempo tidak ditemukan."
+            );
+
+            return;
+
+        }
+
+
+        box =
+            document.createElement("div");
+
+
+        box.id =
+            "dueList";
+
+
+        box.style.width =
+            "100%";
+
+
+        page.appendChild(box);
+
     }
 
 
-    // =====================================================
+    // =================================================
     // TANGGAL HARI INI
-    // =====================================================
+    // =================================================
 
-    const today = new Date();
+    const today =
+        new Date();
+
 
     today.setHours(
         0,
@@ -1205,32 +1297,46 @@ function renderDueDates(){
     );
 
 
-    // =====================================================
-    // FUNGSI MEMBACA TANGGAL INPUT DATE
-    // Supaya tidak bergeser karena timezone
-    // =====================================================
+    // =================================================
+    // BACA TANGGAL DARI INPUT DATE
+    // =================================================
 
     function parseLocalDate(value){
 
         if(!value){
+
             return null;
+
         }
+
+
+        const text =
+            String(value)
+            .substring(0,10);
+
 
         const parts =
-            String(value).split("-");
+            text.split("-");
+
 
         if(parts.length !== 3){
+
             return null;
+
         }
+
 
         const year =
             Number(parts[0]);
 
+
         const month =
             Number(parts[1]) - 1;
 
+
         const day =
             Number(parts[2]);
+
 
         const date =
             new Date(
@@ -1239,6 +1345,18 @@ function renderDueDates(){
                 day
             );
 
+
+        if(
+            isNaN(
+                date.getTime()
+            )
+        ){
+
+            return null;
+
+        }
+
+
         date.setHours(
             0,
             0,
@@ -1246,21 +1364,15 @@ function renderDueDates(){
             0
         );
 
-        if(
-            isNaN(
-                date.getTime()
-            )
-        ){
-            return null;
-        }
 
         return date;
+
     }
 
 
-    // =====================================================
-    // HITUNG SELISIH HARI
-    // =====================================================
+    // =================================================
+    // SELISIH HARI
+    // =================================================
 
     function getDayDifference(date){
 
@@ -1281,15 +1393,16 @@ function renderDueDates(){
     }
 
 
-    // =====================================================
-    // STATUS JATUH TEMPO
-    // =====================================================
+    // =================================================
+    // STATUS
+    // =================================================
 
     function getStatus(diff){
 
         if(diff < 0){
 
             return {
+
                 text:
                     "Sudah jatuh tempo " +
                     Math.abs(diff) +
@@ -1297,6 +1410,7 @@ function renderDueDates(){
 
                 badge:
                     "badge-red"
+
             };
 
         }
@@ -1305,11 +1419,13 @@ function renderDueDates(){
         if(diff === 0){
 
             return {
+
                 text:
                     "Jatuh tempo hari ini",
 
                 badge:
                     "badge-red"
+
             };
 
         }
@@ -1318,12 +1434,14 @@ function renderDueDates(){
         if(diff <= 30){
 
             return {
+
                 text:
                     diff +
                     " hari lagi",
 
                 badge:
                     "badge-red"
+
             };
 
         }
@@ -1332,12 +1450,14 @@ function renderDueDates(){
         if(diff <= 60){
 
             return {
+
                 text:
                     diff +
                     " hari lagi",
 
                 badge:
                     "badge-orange"
+
             };
 
         }
@@ -1357,14 +1477,9 @@ function renderDueDates(){
     }
 
 
-    // =====================================================
-    // DATA PERPANJANGAN STNK
-    //
-    // Tampilkan:
-    // - sudah lewat
-    // - hari ini
-    // - sampai 90 hari ke depan
-    // =====================================================
+    // =================================================
+    // STNK / PERPANJANGAN
+    // =================================================
 
     const stnkDue =
         data
@@ -1375,14 +1490,20 @@ function renderDueDates(){
                     vehicle.tanggal_perpanjangan
                 );
 
+
             if(!date){
+
                 return null;
+
             }
+
 
             const diff =
                 getDayDifference(date);
 
+
             return {
+
                 vehicle:
                     vehicle,
 
@@ -1391,14 +1512,21 @@ function renderDueDates(){
 
                 diff:
                     diff
+
             };
 
         })
         .filter(item => {
 
             if(!item){
+
                 return false;
+
             }
+
+
+            // Sudah lewat tetap muncul.
+            // Maksimal 90 hari ke depan.
 
             return (
                 item.diff <= 90
@@ -1415,14 +1543,9 @@ function renderDueDates(){
         });
 
 
-    // =====================================================
-    // DATA GANTI KALENG / PLAT
-    //
-    // Tampilkan:
-    // - sudah lewat
-    // - hari ini
-    // - sampai 365 hari ke depan
-    // =====================================================
+    // =================================================
+    // GANTI KALENG / PLAT
+    // =================================================
 
     const kalengDue =
         data
@@ -1433,14 +1556,20 @@ function renderDueDates(){
                     vehicle.tanggal_ganti_kaleng
                 );
 
+
             if(!date){
+
                 return null;
+
             }
+
 
             const diff =
                 getDayDifference(date);
 
+
             return {
+
                 vehicle:
                     vehicle,
 
@@ -1449,14 +1578,21 @@ function renderDueDates(){
 
                 diff:
                     diff
+
             };
 
         })
         .filter(item => {
 
             if(!item){
+
                 return false;
+
             }
+
+
+            // Sudah lewat tetap muncul.
+            // Maksimal 1 tahun ke depan.
 
             return (
                 item.diff <= 365
@@ -1473,9 +1609,9 @@ function renderDueDates(){
         });
 
 
-    // =====================================================
-    // RINGKASAN
-    // =====================================================
+    // =================================================
+    // HITUNG RINGKASAN
+    // =================================================
 
     const overdueCount =
         stnkDue.filter(
@@ -1496,9 +1632,9 @@ function renderDueDates(){
         kalengDue.length;
 
 
-    // =====================================================
+    // =================================================
     // JIKA TIDAK ADA DATA
-    // =====================================================
+    // =================================================
 
     if(
         stnkDue.length === 0 &&
@@ -1510,8 +1646,10 @@ function renderDueDates(){
             <div class="empty">
 
                 <strong>
+
                     Belum ada kendaraan
                     yang perlu diperhatikan.
+
                 </strong>
 
                 <br><br>
@@ -1529,18 +1667,16 @@ function renderDueDates(){
     }
 
 
-    // =====================================================
-    // RENDER
-    // =====================================================
+    // =================================================
+    // TAMPILAN
+    // =================================================
 
     box.innerHTML = `
-
-        <!-- RINGKASAN -->
 
         <div style="
             display:grid;
             grid-template-columns:
-                repeat(3, minmax(0, 1fr));
+                repeat(3,minmax(0,1fr));
             gap:12px;
             margin-bottom:24px;
         ">
@@ -1548,11 +1684,15 @@ function renderDueDates(){
             <div class="info-box">
 
                 <strong>
+
                     ${overdueCount}
+
                 </strong>
 
                 <span>
+
                     Sudah Jatuh Tempo
+
                 </span>
 
             </div>
@@ -1561,11 +1701,15 @@ function renderDueDates(){
             <div class="info-box">
 
                 <strong>
+
                     ${soonCount}
+
                 </strong>
 
                 <span>
+
                     STNK ≤ 30 Hari
+
                 </span>
 
             </div>
@@ -1574,11 +1718,15 @@ function renderDueDates(){
             <div class="info-box">
 
                 <strong>
+
                     ${kalengCount}
+
                 </strong>
 
                 <span>
+
                     Ganti Kaleng / Plat
+
                 </span>
 
             </div>
@@ -1586,9 +1734,9 @@ function renderDueDates(){
         </div>
 
 
-        <!-- =================================================
-             PERPANJANGAN STNK
-        ================================================== -->
+        <!-- =========================================
+             STNK
+        ========================================== -->
 
         <h3 style="
             margin:0 0 14px 0;
@@ -1605,12 +1753,15 @@ function renderDueDates(){
             ?
 
             `
+
                 <div class="empty">
 
                     Tidak ada kendaraan yang
-                    jatuh tempo dalam 90 hari.
+                    perlu diperpanjang dalam
+                    90 hari ke depan.
 
                 </div>
+
             `
 
             :
@@ -1620,6 +1771,7 @@ function renderDueDates(){
                 const vehicle =
                     item.vehicle;
 
+
                 const status =
                     getStatus(
                         item.diff
@@ -1628,7 +1780,8 @@ function renderDueDates(){
 
                 return `
 
-                    <div class="info-box"
+                    <div
+                        class="info-box"
                         style="
                             margin-bottom:12px;
                         "
@@ -1715,9 +1868,9 @@ function renderDueDates(){
         }
 
 
-        <!-- =================================================
-             GANTI KALENG / PLAT
-        ================================================== -->
+        <!-- =========================================
+             GANTI KALENG
+        ========================================== -->
 
         <h3 style="
             margin:28px 0 14px 0;
@@ -1734,13 +1887,15 @@ function renderDueDates(){
             ?
 
             `
+
                 <div class="empty">
 
                     Belum ada kendaraan yang
-                    mendekati jadwal ganti
+                    memiliki jadwal ganti
                     kaleng / plat dalam 1 tahun.
 
                 </div>
+
             `
 
             :
@@ -1750,6 +1905,7 @@ function renderDueDates(){
                 const vehicle =
                     item.vehicle;
 
+
                 const status =
                     getStatus(
                         item.diff
@@ -1758,7 +1914,8 @@ function renderDueDates(){
 
                 return `
 
-                    <div class="info-box"
+                    <div
+                        class="info-box"
                         style="
                             margin-bottom:12px;
                         "
@@ -1811,7 +1968,8 @@ function renderDueDates(){
 
                         <span>
 
-                            Jadwal Ganti Kaleng / Plat:
+                            Jadwal Ganti
+                            Kaleng / Plat:
 
                             <strong>
 
@@ -1847,6 +2005,66 @@ function renderDueDates(){
     `;
 
 }
+
+
+// =====================================================
+// FORMAT TANGGAL
+// =====================================================
+
+function formatDate(value){
+
+    if(!value){
+
+        return "-";
+
+    }
+
+
+    const text =
+        String(value)
+        .substring(0,10);
+
+
+    const parts =
+        text.split("-");
+
+
+    if(parts.length === 3){
+
+        return (
+            parts[2] +
+            "/" +
+            parts[1] +
+            "/" +
+            parts[0]
+        );
+
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if(isNaN(date.getTime())){
+
+        return value;
+
+    }
+
+
+    return date.toLocaleDateString(
+        "id-ID",
+        {
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric"
+        }
+    );
+
+}
+
+
 // =====================================================
 // SECURITY / ESCAPE HTML
 // =====================================================
@@ -2097,7 +2315,6 @@ sb.auth.onAuthStateChange(
                 $("profileEmail").textContent =
                     email;
 
-
         }else{
 
             showLogin();
@@ -2147,7 +2364,6 @@ sb.auth.onAuthStateChange(
         await loadMaintenance();
 
         openPage("dashboard");
-
 
     }else{
 
